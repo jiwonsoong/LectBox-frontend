@@ -17,6 +17,17 @@ function IconView() {
 
     */
 
+    const onFolderHandler = (item)=> {
+        if (item[2] === true) {
+            // 현재 폴더 변경
+            
+            // 페이지 리다이렉트
+
+        } else {
+            // 파일 미리보기 
+        }
+    }
+
     // 폴더 정보 요청 응답 예시
     const response = {
         forderId: '123',
@@ -30,22 +41,40 @@ function IconView() {
     const itemList = response.items
 
     return (
-        <div>
-            아이콘 보기 형식
-            {
-                itemList.map(function(item){
-                    return (
-                        <div key={item[0]}>
+        <ul className="IconList">
+            {itemList.map(item => (
+                <li onDoubleClick={()=>onFolderHandler(item)} key={item[0]}> 
+                    <div className="Iconbox">
                             {
                                 item[2] === true 
                                 ? (<FontAwesomeIcon icon={faFolder} className="FolderIcon"/>)
                                 : (<FontAwesomeIcon icon={faFileLines} className="FileIcon"/>)
                             }
+                    </div>
+                    <div className="ListNameBox">
+                        <p>{item[1]}</p>
+                    </div>                     
+                </li>
+            ))} 
+        </ul>
+        /*
+        <div className="IconView">
+            {
+                itemList.map(function(item){
+                    return (
+                        <div className="iconitem" key={item[0]}>
+                            <div className="Iconbox">
+                            {
+                                item[2] === true 
+                                ? (<FontAwesomeIcon icon={faFolder} className="FolderIcon"/>)
+                                : (<FontAwesomeIcon icon={faFileLines} className="FileIcon"/>)
+                            }
+                            </div>
                         </div>
                     )
                 })
             }
-        </div>
+            </div>*/
     )
 }
 

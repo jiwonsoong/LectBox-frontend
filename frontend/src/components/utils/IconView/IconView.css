@@ -1,7 +1,32 @@
 .FolderIcon {
-    color: rgb(255, 246, 148);
+    color: #a0c4dd;
+    font-size: 100px;
+    
 }
 
 .FileIcon {
-    color: rgb(24, 113, 255);
+    color: #2f6d98;
+}
+
+.IconList {
+    display: flex;
+}
+
+.IconList li {
+    flex: 20% 0 0;
+    padding: 20px;
+}
+
+.IconList li:hover {
+    cursor: pointer;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.IconList .ListIconBox {
+    margin: 0 10px 0 30px;
 }

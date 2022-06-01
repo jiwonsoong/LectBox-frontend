@@ -18,13 +18,13 @@ function HomePage() {
     const u_id = localStorage.getItem('user');
 
     // 페이지 첫 렌더링 시 폴더 정보 요청
-    useEffect(() => {
+    /*useEffect(() => {
         dispatch(folderActions.read({u_id}))
         .then(response => {
             f_data = response.payload
 
         })
-    }, [])
+    }, [])*/
     
 
     // 폴더 정보 받아오면 이름순, 생성순 각각 저장 
