@@ -15,7 +15,6 @@ function LandingPage() {
     }
 
     useEffect(()=>{
-        console.log(now)
     })
     return (
         <div>

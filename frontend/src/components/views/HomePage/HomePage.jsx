@@ -6,6 +6,7 @@ import { faFileLines } from '@fortawesome/free-regular-svg-icons';
 import { faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from "react-redux";
 import { folderActions } from "../../../_actions";
+import { authHeader } from "../../../_helpers";
 
 function HomePage(props) {
     const dispatch = useDispatch();
@@ -13,7 +14,7 @@ function HomePage(props) {
     const [sort, setsort] = useState('name'); // time, name
     const [isViewModal, setisViewModal] = useState(false);
     const [classCode, setclasscode] = useState(''); 
-    const [itemList, setitemList] = useState([]);
+    //const [itemList, setitemList] = useState([]);
 
     const u_id = localStorage.getItem('user');
 
@@ -36,20 +37,19 @@ function HomePage(props) {
         kinds: 0,
         items: [['folder1','캡스톤디자인', true], ['folder2','클라우드컴퓨팅',true]]
     }
-    //let itemList = response.items
-    
+    let itemList = response.items
+    //setitemList(['folder1','캡스톤디자인', true]);
     const now = useSelector(rootReducer => rootReducer.folder);
 
     // 페이지 첫 렌더링 시 폴더 정보 요청
     useEffect(() => {
-        const requestOptions = {
+        /*const requestOptions = {
             method: 'GET',
             headers: authHeader()
         };
 
         fetch('/class', requestOptions)
-        .then(handleResponse)
-    }, [])
+    .then(handleResponse)    */}, [])
     
 
     // 폴더 정보 받아오면 이름순, 생성순 각각 저장 
