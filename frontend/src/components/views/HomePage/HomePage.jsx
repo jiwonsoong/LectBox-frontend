@@ -8,22 +8,24 @@ import { ListView } from "../../utils/ListVIew";
 import { IconView } from "../../utils/IconView/IconView";
 import { useDispatch } from "react-redux";
 import { folderActions } from "../../../_actions";
+import { authHeader } from "../../../_helpers";
 
 function HomePage() {
     const dispatch = useDispatch();
     const [view, setview] = useState('icon'); // icon, list
     const [sort, setsort] = useState('name'); // time, name
-    const [isViewModal, setisViewModal] = useState(false);
+    const [isViewModal, setisViewModal] = useState(true);
+    const [classCode, setclasscode] = useState('') 
 
     const u_id = localStorage.getItem('user');
 
     // 페이지 첫 렌더링 시 폴더 정보 요청
     useEffect(() => {
-        dispatch(folderActions.read({u_id}))
-        .then(response => {
-            f_data = response.payload
+        // dispatch(folderActions.read({u_id}))
+        // .then(response => {
+        //     f_data = response.payload
 
-        })
+        // })
     }, [])
     
 
@@ -52,9 +54,49 @@ function HomePage() {
     const viewModal = () => {
         setisViewModal(true)
     }
-    // 강의실 생성 함수
-    const AddRoom = () => {
+    const closeModal = () => {
+        setisViewModal(false)
+    }
 
+    const handleResponse = (response) => {
+        return response.text().then(text => {
+            const data = text && JSON.parse(text);
+            if (!response.status === 200) {
+                if (response.status === 401) {
+                    // auto logout if 401 response returned from api
+                    
+                    window.location.reload(true);
+                }
+    
+                const error = (data && data.message) || response.statusText;
+                return Promise.reject(error);
+            }
+    
+            return data;
+        });
+    }
+
+    // 강의실 입장 코드 입력
+    const onClassCodeHandler = (event) => {
+        setclasscode(event.currentTarget.value)
+    }
+    // 강의실 생성 함수
+    const AddClass = () => {
+        // 유효성 검사
+        if (classCode === "") {
+            return alert('강의실 코드를 입력해주세요.')
+        }
+
+        // 요청 보내기 
+        const requestOptions = {
+            method: 'GET',
+            headers: authHeader()
+        };
+        
+        f_id = classCode;
+
+        fetch('/users/{f_id}', requestOptions)
+        .then(handleResponse)
     }
 
     return (
@@ -93,9 +135,28 @@ function HomePage() {
                 }
             </div>
             {/* 강의실 생성 모달 */}
-            <div className="modal">
-
-            </div>
+            {
+                isViewModal === true
+                && (
+                    <div className="modal">
+                        <div className="modal-item">
+                            <div className="modal-content">
+                                <p>강의실 입장</p>
+                                <p style={{fontSize:'12px', marginTop: '0'}}>강의실에 입장하기 위해서는 강의실 코드를 입력해주세요.</p>
+                                <input type="text" value={classCode} onChange={onClassCodeHandler} style={{margin:'10px 0'}}/>
+                                <div className="modal-button">
+                                    <button onClick={AddClass}>
+                                        입장하기
+                                    </button>
+                                    <button onClick={closeModal} style={{backgroundColor:'white'}}>
+                                        취소
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
         </div>
     )
 }
