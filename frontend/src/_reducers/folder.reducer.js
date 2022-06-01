@@ -1,11 +1,15 @@
 import { folderConstants } from '../_constants';
 
 export function folder(state={
-    value:'first'}, action) {
+    f_id: 'user123',
+    f_name:'손지원'
+
+}, action) {
     if (action.type === 'CHANGE_FOLDER') {
         return {
             ...state,
-            value: action.payload
+            f_id: action.payload.f_id,
+            f_name: action.payload.f_name
         }
     }
     return state

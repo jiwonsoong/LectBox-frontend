@@ -26,13 +26,13 @@ function NavBar() {
                 <Link to="/">
                     <img className='NavbarLogo' src={logoImage}/>
                 </Link>
-                {
+                {/* {
                     loginState===true 
                     && 
                     (<Link to={link} className='NavbarLink'>
                         <div className="NavbarTitle">{title}'s Lectbox</div>
                     </Link>)
-                }
+                } */}
                 
             </div>
             <button className='NavbarRight'>

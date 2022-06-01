@@ -4,10 +4,13 @@ export const folderActions = {
     read,
     change
 };
-function change(f_id) {
+function change(id, name) {
     return {
         type: 'CHANGE_FOLDER',
-        payload: f_id
+        payload: {
+            f_id: id,
+            f_name: name
+        }
     }
 }
 

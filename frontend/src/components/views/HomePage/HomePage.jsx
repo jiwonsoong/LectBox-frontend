@@ -1,6 +1,5 @@
 import axios from "axios";
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
@@ -8,7 +7,7 @@ import { faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTa
 import { useDispatch, useSelector } from "react-redux";
 import { folderActions } from "../../../_actions";
 
-function HomePage() {
+function HomePage(props) {
     const dispatch = useDispatch();
     const [view, setview] = useState('icon'); // icon, list
     const [sort, setsort] = useState('name'); // time, name
@@ -18,14 +17,11 @@ function HomePage() {
     const u_id = localStorage.getItem('user');
 
     const onFolderHandler = (item)=> {
-        if (item[2] === true) {
-            // 현재 폴더 변경
-            
-            // 페이지 리다이렉트
-
-        } else {
-            // 파일 미리보기 
-        }
+        // 이동할 폴더 저장
+        dispatch(folderActions.change(item[0], item[1]))
+        // 페이지 리다이렉트
+        const url = '/class/' + item[0]
+        props.history.push(url);
     }
 
 
@@ -45,7 +41,7 @@ function HomePage() {
 
     // 페이지 첫 렌더링 시 폴더 정보 요청
     useEffect(() => {
-        console.log({now})
+        console.log('렌더링')
         // dispatch(folderActions.read({u_id}))
         // .then(response => {
         //     f_data = response.payload
@@ -127,11 +123,8 @@ function HomePage() {
         // 입장 성공하면
         // 입장됐다고 알림
         // 입장 모달창 끄기
+        setisViewModal(false)
         // 렌더링 
-    }
-
-    const changeFolder = ()=> {
-        dispatch(folderActions.change('second'))
     }
 
     return (
@@ -158,7 +151,7 @@ function HomePage() {
                 <div className="Category">
                     <div className="CategoryName">강의실</div>
                     {/* 강의실 추가 버튼 */}
-                    <div className="CategoryPlusIcon" title='강의실 생성' onClick={viewModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
+                    <div className="CategoryPlusIcon" title='강의실 추가' onClick={viewModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
                 </div>
                 
             </div>
@@ -229,9 +222,6 @@ function HomePage() {
                     </div>
                 )
             }
-            <div onClick={changeFolder}>
-            눌러
-            </div>
         </div>
     )
 }
