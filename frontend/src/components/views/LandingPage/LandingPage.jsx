@@ -14,6 +14,9 @@ function LandingPage() {
         console.log(content)
     }
 
+    useEffect(()=>{
+        console.log(now)
+    })
     return (
         <div>
             시작 페이지

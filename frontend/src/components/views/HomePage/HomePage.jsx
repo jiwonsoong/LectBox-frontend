@@ -12,7 +12,8 @@ function HomePage(props) {
     const [view, setview] = useState('icon'); // icon, list
     const [sort, setsort] = useState('name'); // time, name
     const [isViewModal, setisViewModal] = useState(false);
-    const [classCode, setclasscode] = useState('') 
+    const [classCode, setclasscode] = useState(''); 
+    const [itemList, setitemList] = useState([]);
 
     const u_id = localStorage.getItem('user');
 
@@ -35,18 +36,19 @@ function HomePage(props) {
         kinds: 0,
         items: [['folder1','캡스톤디자인', true], ['folder2','클라우드컴퓨팅',true]]
     }
-    const itemList = response.items
+    //let itemList = response.items
     
     const now = useSelector(rootReducer => rootReducer.folder);
 
     // 페이지 첫 렌더링 시 폴더 정보 요청
     useEffect(() => {
-        console.log('렌더링')
-        // dispatch(folderActions.read({u_id}))
-        // .then(response => {
-        //     f_data = response.payload
+        const requestOptions = {
+            method: 'GET',
+            headers: authHeader()
+        };
 
-        // })
+        fetch('/class', requestOptions)
+        .then(handleResponse)
     }, [])
     
 
@@ -80,45 +82,45 @@ function HomePage(props) {
     }
 
     const handleResponse = (response) => {
-        return response.text().then(text => {
-            const data = text && JSON.parse(text);
-            if (!response.status === 200) {
-                if (response.status === 401) {
-                    // auto logout if 401 response returned from api
-                    
-                    window.location.reload(true);
-                }
-    
-                const error = (data && data.message) || response.statusText;
-                return Promise.reject(error);
+        if (!response.status === 200) {
+            if (response.status === 401) {
+                // auto logout if 401 response returned from api
+                
+                window.location.reload(true);
             }
-    
-            return data;
-        });
+
+            const error = (data && data.message) || response.statusText;
+            return Promise.reject(error);
+        }
+        setitemList([response.items])
     }
 
     // 강의실 입장 코드 입력
     const onClassCodeHandler = (event) => {
         setclasscode(event.currentTarget.value)
     }
+
     // 강의실 생성 함수
     const AddClass = () => {
         // 유효성 검사
         if (classCode === "") {
             return alert('강의실 코드를 입력해주세요.')
         }
-
+        file_id = classCode;
         // 요청 보내기 
         const requestOptions = {
-            method: 'GET',
-            headers: authHeader()
+            method: 'POST',
+            headers: authHeader(),
+            body: JSON.stringify({file_id})
         };
-        
-        f_id = classCode;
 
-        fetch('/users/{f_id}', requestOptions)
+        fetch('/class', requestOptions)
         .then(handleResponse)
-
+        .then(data => console.log(data)
+        .then(alert("입장되었습니다."))
+        .then(closeModal())
+         
+        );
 
         // 입장 성공하면
         // 입장됐다고 알림
