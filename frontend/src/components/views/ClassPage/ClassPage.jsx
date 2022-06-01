@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
 import { faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge } from '@fortawesome/free-solid-svg-icons'
+import { authHeader } from '../../../_helpers';
 
 
 function ClassPage(props) {
@@ -16,7 +17,7 @@ function ClassPage(props) {
     const [assignItems, setassignItems] = useState([]);
     const [folderInfo, setfolderInfo] = useState({});
     const [isViewAddModal, setisViewAddModal] = useState(false);
-    const [newFolderName, setnewFolderName] = useState('제목 없는 폴더')
+    const [newFolderName, setnewFolderName] = useState('')
     const [newParent, setnewParent] = useState('Lecture') // Lecture, Assignment
 
     // const user = JSON.parse(localStorage.getItem('user'));
@@ -24,43 +25,88 @@ function ClassPage(props) {
     const is_student = false;
 
     useEffect(() => {
-        // 강의실 정보 요청
-        const url = 'api/folder/' + params.classid
+        const state = 'development';
 
-        // dummy 데이터
-//         {폴더id, name, made_by(fk .//유저id), max_볼륨, pres_볼륨, 종류(0(일반),1(강의실),2(과제),3(팀))
-// ‘items’ : [[id, name, is_folder(boolen),],[],…..]}
-        const response = {
-            f_id: 12345,
-            f_name: '클라우드컴퓨팅',
-            made_by: '김재홍',
-            max_vol: 50,
-            pres_vol: 30
+        if(state==='development'){
+            // dummy 데이터
+            const response = {
+                f_id: 12345,
+                f_name: '클라우드컴퓨팅',
+                made_by: '김재홍',
+                max_vol: 50,
+                pres_vol: 30
+
+            }
+
+            setfolderInfo(
+                {
+                    f_id: response.f_id,
+                    f_name: response.f_name,
+                }
+            )
+
+            setlectItems([
+                [101, '1주차', true],
+                [102, '2주차', true],
+                [201, '강의계획서', false]
+            ]);
+            
+            setassignItems([
+                [301, '장고과제', true],
+                [302, 'ec2과제', true],
+                [401, '숙제1_홍길동', false]
+            ])
+
+        } 
+        else {
+            // 백엔드랑 연동 시
+
+            // 강의 폴더 정보 요청
+            const url_lect = 'api/folder/' + params.classid + '/1';
+            const requestOptions = {
+                method: 'GET',
+                headers: authHeader()
+            };
+            fetch(url_lect, requestOptions)
+            .then(
+                (response) => {
+                    handleResponse(response)
+                    .then(
+                        data => {
+                            setlectItems([data.items]);
+                            setfolderInfo(
+                                {
+                                    f_id: data.id,
+                                    f_name: data.name
+                                }
+                            )
+                        },
+                        error => alert("에러입니다.")
+                    )
+                }
+            )
+            
+            // 과제 폴더 정보 요청
+            const url_assign = 'api/folder/' + params.classid + '/2';
 
         }
-
-        setfolderInfo(
-            {
-                f_id: response.f_id,
-                f_name: response.f_name,
-            }
-        )
-
-        setlectItems([
-            [101, '1주차', true],
-            [102, '2주차', true],
-            [201, '강의계획서', false]
-        ]);
-        
-        setassignItems([
-            [301, '장고과제', true],
-            [302, 'ec2과제', true],
-            [401, '숙제1_홍길동', false]
-        ])
 
 
     }, [])
     
+    const handleResponse = (response) => {
+        if (!response.status === 200) {
+            if (response.status === 401) {
+                // auto logout if 401 response returned from api
+                
+                window.location.reload(true);
+            }
+
+            const error = (data && data.message) || response.statusText;
+            return Promise.reject(error);
+        }
+        return response;
+    }
     
     // 파일 보기 방식 변경 함수
     const onViewHandler = (e)=>{
@@ -86,16 +132,61 @@ function ClassPage(props) {
     const addFolder = (e) => {
         console.log(newFolderName)
         console.log(newParent)
+        if(newFolderName==='') {
+            return alert('폴더명을 입력하세요.')
+        } 
+        else {
+            if(newParent==='Lecture') {
+                // 강의 내에 폴더 생성
+                const requestOptions = {
+                    method: 'POST',
+                    headers: authHeader(),
+                    body: JSON.stringify({
+                        parent: folderInfo.f_id,
+                        name: newFolderName,
+                        type: 1
+                    })
+                };
 
-        if(newParent==='Lecture') {
-            // 요청
-            
-        } else {
-            // 요청
-            
+                addFolderRequest(requestOptions, 1)
+    
+            } else {
+                // 과제 내에 폴더 생성
+                const requestOptions = {
+                    method: 'POST',
+                    headers: authHeader(),
+                    body: JSON.stringify({
+                        parent: folderInfo.f_id,
+                        name: newFolderName,
+                        type: 2
+                    })
+                };
+
+                addFolderRequest(requestOptions, 2)
+    
+            }
         }
-
-        
+    }
+    const addFolderRequest = (requestOptions, parent) => {
+        fetch('/api/folder', requestOptions)
+        .then((response) => {
+            handleResponse(response)
+            .then(
+                data => {
+                    if (parent === 1) {
+                        setlectItems([data.items])
+                    } else {
+                        setassignItems([data.items])
+                    }
+                    alert('추가되었습니다.');
+                    closeAddFolderModal();
+                },
+                error => {
+                    alert("에러입니다.");
+                    closeAddFolderModal();
+                }
+            )
+        })
     }
     const newParentIsLect = ()=>{
         setnewParent('Lecture')
@@ -115,6 +206,13 @@ function ClassPage(props) {
     }
     const closeAddFolderModal = () => {
         setisViewAddModal(false)
+    }
+
+
+    // 폴더 입장
+    const onFolderHandler = (item) => {
+        const url = '/folder/' + item[0];
+        props.history.push(url);
     }
 
     return (
@@ -183,7 +281,7 @@ function ClassPage(props) {
                     <ul className="IconList">
                     {
                         lectItems.map(item => (
-                            <li onDoubleClick={()=>onFolderHandler(item)} key={item[0]}> 
+                            <li  onDoubleClick={()=>onFolderHandler(item)} key={item[0]}> 
                                 <div className="Iconbox">
                                         {
                                             item[2] === true 
