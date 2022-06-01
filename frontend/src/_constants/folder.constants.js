@@ -1,0 +1,5 @@
+export const folderConstants = {
+    READ_REQUEST: 'FOLDER_READ_REQUEST',
+    READ_SUCCESS: 'FOLDER_READ_SUCCESS',
+    READ_FAILURE: 'FOLDER_READ_FAILURE'
+}

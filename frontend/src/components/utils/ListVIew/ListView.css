@@ -1,0 +1,40 @@
+.ListFolderIcon {
+    color: #a0c4dd;
+    font-size: 17px;
+}
+
+.ListFileIcon {
+    color: #2f6d98;
+}
+
+.ListView {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+
+}
+
+.ListColDescription {
+    border-bottom: 1px solid #dadce0;
+    padding: 10px 0 10px 80px;
+}
+
+.ListItem {
+    border-bottom: 1px solid #dadce0;
+    display: flex;
+    padding: 10px 10px;
+}
+.ListItem:hover {
+    cursor:pointer;
+}
+
+.ListItem .ListIconBox {
+    margin: 0 10px 0 30px;
+}
+
+.ListItem .ListNameBox {
+    margin: 0 10px;
+}
+.ListItem .ListNameBox p{
+    margin: 0 0;
+}

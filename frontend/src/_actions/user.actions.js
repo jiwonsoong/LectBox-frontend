@@ -2,6 +2,10 @@ import { userConstants } from '../_constants';
 import { userService } from '../_services';
 import { alertActions } from './';
 import { history } from '../_helpers';
+import axios from 'axios';
+import {
+    REGISTER_USER
+} from './types'
 
 export const userActions = {
     login,
@@ -11,11 +15,11 @@ export const userActions = {
     delete: _delete
 };
 
-function login(username, password, from) {
+function login(id, pw, from) {
     return dispatch => {
-        dispatch(request({ username }));
+        dispatch(request({ id }));
 
-        userService.login(username, password)
+        userService.login(id, pw)
             .then(
                 user => { 
                     dispatch(success(user));
@@ -38,27 +42,14 @@ function logout() {
     return { type: userConstants.LOGOUT };
 }
 
-function register(user) {
-    return dispatch => {
-        dispatch(request(user));
+function register(dataToSubmit) {
+    const request = axios.post('/api/sign-up', dataToSubmit)
+    .then(response => response.data)
 
-        userService.register(user)
-            .then(
-                user => { 
-                    dispatch(success());
-                    history.push('/login');
-                    dispatch(alertActions.success('Registration successful'));
-                },
-                error => {
-                    dispatch(failure(error.toString()));
-                    dispatch(alertActions.error(error.toString()));
-                }
-            );
-    };
-
-    function request(user) { return { type: userConstants.REGISTER_REQUEST, user } }
-    function success(user) { return { type: userConstants.REGISTER_SUCCESS, user } }
-    function failure(error) { return { type: userConstants.REGISTER_FAILURE, error } }
+    return {
+        type: REGISTER_USER,
+        payload: request
+    }
 }
 
 function getAll() {
@@ -84,7 +75,7 @@ function _delete(id) {
 
         userService.delete(id)
             .then(
-                user => dispatch(success(id)),
+                user => dispatch(success(user)),
                 error => dispatch(failure(id, error.toString()))
             );
     };

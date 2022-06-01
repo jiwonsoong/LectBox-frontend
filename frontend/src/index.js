@@ -1,7 +1,7 @@
 import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
 import { Provider } from 'react-redux';
-import { render } from 'react-dom';
-
 import { store } from './_helpers';
 import { App } from './App';
 
@@ -9,9 +9,9 @@ import { App } from './App';
 import { configureFakeBackend } from './_helpers';
 configureFakeBackend();
 
-render(
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
     <Provider store={store}>
         <App />
-    </Provider>,
-    document.getElementById('app')
+    </Provider>
 );

@@ -1,0 +1,47 @@
+.Navbar {
+    display:flex;
+    height:55px;
+    border-bottom:solid 1px #d0d2d4;
+    align-items:center;
+    justify-content: space-between;
+}
+
+.NavbarLeft {
+    display:flex;
+    align-items:center;
+    margin-left: 50px;
+}
+
+.NavbarRight {
+    display:flex;
+    margin-right:100px;
+    border:solid 1px #d0d2d4; 
+    border-radius:5px;
+    padding:0;
+    background:inherit;
+    cursor:pointer;
+}
+
+.NavbarLeft .NavbarLogo {
+    height:35px;
+    margin-left:50px;
+}
+.NavbarLink {
+    text-decoration: none;
+    color: black;
+}
+.NavbarLink:hover {
+    text-decoration: underline;
+}
+.NavbarLeft .NavbarTitle {
+    margin-left:50px;
+    font-weight:500;
+}
+
+.NavbarRight div {
+    margin:7px 15px;
+    font-size:0.8rem,
+}
+.NavbarRight div:hover {
+    text-decoration: underline;
+}

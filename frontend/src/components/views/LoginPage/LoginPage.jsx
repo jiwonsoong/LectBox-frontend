@@ -3,15 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { userActions } from '../../../_actions';
 
-
-
 function LoginPage() {
     const [inputs, setInputs] = useState({
-        username: '',
-        password: ''
+        id: '',
+        pw: ''
     });
     const [submitted, setSubmitted] = useState(false);
-    const { username, password } = inputs;
+    const { id, pw } = inputs;
     const loggingIn = useSelector(state => state.authentication.loggingIn);
     const dispatch = useDispatch();
     const location = useLocation();
@@ -30,28 +28,27 @@ function LoginPage() {
         e.preventDefault();
 
         setSubmitted(true);
-        if (username && password) {
+        if (id && pw) {
             // get return url from location state or default to home page
             const { from } = location.state || { from: { pathname: "/" } };
-            dispatch(userActions.login(username, password, from));
+            dispatch(userActions.login(id, pw, from));
         }
     }
 
     return (
         <div className="col-lg-8 offset-lg-2">
-            <h2>LectBox</h2>
             <form name="form" onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>이메일</label>
-                    <input type="text" name="username" value={username} onChange={handleChange} className={'form-control' + (submitted && !username ? ' is-invalid' : '')} />
-                    {submitted && !username &&
+                    <input type="text" name="id" value={id} onChange={handleChange} className={'form-control' + (submitted && !id ? ' is-invalid' : '')} />
+                    {submitted && !id &&
                         <div className="invalid-feedback">이메일을 입력해주세요</div>
                     }
                 </div>
                 <div className="form-group">
                     <label>비밀번호</label>
-                    <input type="password" name="password" value={password} onChange={handleChange} className={'form-control' + (submitted && !password ? ' is-invalid' : '')} />
-                    {submitted && !password &&
+                    <input type="pw" name="pw" value={pw} onChange={handleChange} className={'form-control' + (submitted && !pw ? ' is-invalid' : '')} />
+                    {submitted && !pw &&
                         <div className="invalid-feedback">비밀번호를 입력해주세요</div>
                     }
                 </div>
