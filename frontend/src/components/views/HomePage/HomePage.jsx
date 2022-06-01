@@ -5,7 +5,7 @@ import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
 import { faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge } from '@fortawesome/free-solid-svg-icons'
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { folderActions } from "../../../_actions";
 
 function HomePage() {
@@ -40,9 +40,12 @@ function HomePage() {
         items: [['folder1','캡스톤디자인', true], ['folder2','클라우드컴퓨팅',true]]
     }
     const itemList = response.items
+    
+    const now = useSelector(rootReducer => rootReducer.folder);
 
     // 페이지 첫 렌더링 시 폴더 정보 요청
     useEffect(() => {
+        console.log({now})
         // dispatch(folderActions.read({u_id}))
         // .then(response => {
         //     f_data = response.payload
@@ -119,6 +122,16 @@ function HomePage() {
 
         fetch('/users/{f_id}', requestOptions)
         .then(handleResponse)
+
+
+        // 입장 성공하면
+        // 입장됐다고 알림
+        // 입장 모달창 끄기
+        // 렌더링 
+    }
+
+    const changeFolder = ()=> {
+        dispatch(folderActions.change('second'))
     }
 
     return (
@@ -216,6 +229,9 @@ function HomePage() {
                     </div>
                 )
             }
+            <div onClick={changeFolder}>
+            눌러
+            </div>
         </div>
     )
 }

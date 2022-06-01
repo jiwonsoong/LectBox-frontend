@@ -2,7 +2,14 @@ import { folderConstants } from '../_constants';
 
 export const folderActions = {
     read,
+    change
 };
+function change(f_id) {
+    return {
+        type: 'CHANGE_FOLDER',
+        payload: f_id
+    }
+}
 
 function read(f_id) {
     return dispatch => {

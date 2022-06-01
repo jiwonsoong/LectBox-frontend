@@ -9,6 +9,8 @@ import { HomePage } from '../components/views/HomePage';
 import { LoginPage } from '../components/views/LoginPage/LoginPage';
 import { RegisterPage } from "../components/views/RegisterPage/RegisterPage";
 import { NavBar } from '../components/views/NavBar';
+import { ClassPage } from '../components/views/ClassPage';
+
 
 function App() {
     const alert = useSelector(state => state.alert);
@@ -32,7 +34,8 @@ function App() {
                     <Route exact path="/" component={LandingPage} />
                     <Route path="/login" component={LoginPage} />
                     <Route path="/register" component={RegisterPage} />
-                    <Route path='/user' component={HomePage}/>
+                    <Route path='/user' component={HomePage} />
+                    <Route path='/class' component={ClassPage} />
                     <Redirect from="*" to="/" />
                 </Switch>
             </Router>
