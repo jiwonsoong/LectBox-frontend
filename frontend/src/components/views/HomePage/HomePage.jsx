@@ -9,51 +9,105 @@ import { folderActions } from "../../../_actions";
 import { authHeader } from "../../../_helpers";
 
 function HomePage(props) {
-    const dispatch = useDispatch();
-    const [view, setview] = useState('icon'); // icon, list
-    const [sort, setsort] = useState('name'); // time, name
-    const [isViewModal, setisViewModal] = useState(false);
-    const [classCode, setclasscode] = useState(''); 
-    //const [itemList, setitemList] = useState([]);
+    // 컴포넌트 State
+    const [view, setview] = useState('icon'); // 보기 방식 - icon, list
+    const [sort, setsort] = useState('name'); // 정렬 방식 - time, name
+    const [isViewModal, setisViewModal] = useState(false); // 강의실 추가 모달창 노출 여부
+    const [classCode, setclasscode] = useState(''); // 강의실 추가 코드
+    //const [itemList, setitemList] = useState([]); // 강의실 목록 
+    // 필요한 유저 정보: is_student (localStorage에서 가져오기)
 
-    const u_id = localStorage.getItem('user');
+    // dummy data
+    const itemList = [['folder1','캡스톤디자인', true], ['folder2','클라우드컴퓨팅',true]]
+    // const u_id = localStorage.getItem('user');
+    const is_student = false;
 
-    const onFolderHandler = (item)=> {
-        // 이동할 폴더 저장 (redux 사용 시)
-        // dispatch(folderActions.change(item[0], item[1]))
+    // 페이지 첫 렌더링 시 동작
+    useEffect(() => {
+        // 폴더 정보 요청하여 강의실 리스트 생성
+        // folderRequest()
+        // .then(
+        //     data => {
+        //         setitemList([data.items]);
+        //     }
+        // )
+        
+    }, [])
+
+    /**
+     * 요청
+     */
+    // 폴더 정보 요청 함수
+    const folderRequest = () => {
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            },
+        };
+
+        return (
+            fetch('api/class', requestOptions)
+            .then(handleResponse)
+        )
+    };
+
+    // 강의실 입장 요청 함수
+    const registerClassRequest = () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            },
+            body: JSON.stringify({ classCode })
+        };
+
+        return (
+            fetch('api/class', requestOptions)
+            .then(handleResponse)
+        )
+    }
+
+    // 강의실 생성 요청 함수 
+    const addClassRequest = () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            },
+            body: JSON.stringify({
+                parent: 0,
+                name: classCode,
+                type: 0
+            })
+        };
+
+        return (
+            fetch('/api/folder', requestOptions)
+            .then(handleResponse)
+        )
+    }
+
+    const handleResponse = (response) => {
+        if (!response.status === 200) {
+            if (response.status === 400 || response.status === 401 || response.status === 404) {
+                window.location.reload(true);
+            }
+            const error = (data && data.message) || response.statusText;
+            return Promise.reject(error);
+        }
+        return response;
+    }
+
+    // 강의실 이동 함수
+    const openFolder = (item)=> {
         // 페이지 리다이렉트
         const url = '/class/' + item[0]
         props.history.push(url);
     }
-
-
-    // 폴더 정보 요청 응답 예시
-    const response = {
-        folderId: '123',
-        folderName: 'user123',
-        made_by: 'user123',
-        max_volume: 100,
-        pres_volume: 20,
-        kinds: 0,
-        items: [['folder1','캡스톤디자인', true], ['folder2','클라우드컴퓨팅',true]]
-    }
-    let itemList = response.items
-    
-    const now = useSelector(rootReducer => rootReducer.folder);
-
-    // 페이지 첫 렌더링 시 폴더 정보 요청
-    useEffect(() => {
-        /*const requestOptions = {
-            method: 'GET',
-            headers: authHeader()
-        };
-
-        fetch('/class', requestOptions)
-        .then(handleResponse)*/
-    }, [])
-    
-
-    // 폴더 정보 받아오면 이름순, 생성순 각각 저장 
 
     // 파일 보기 방식 변경 함수
     const onViewHandler = (e)=>{
@@ -68,63 +122,65 @@ function HomePage(props) {
     const onSortHandler = (e) => {
         if (sort==='time') {
             setsort('name')
-            // 요청
+            // 
         } else {
             setsort('time')
-            // 요청
+            // 
         }
     }
 
+    /**
+     * 강의실 추가 기능
+     */
+    // 모달창 여는 함수
     const viewModal = () => {
         setisViewModal(true)
     }
+    // 모달창 닫는 함수
     const closeModal = () => {
         setisViewModal(false)
     }
-
-    const handleResponse = (response) => {
-        if (!response.status === 200) {
-            if (response.status === 401) {
-                // auto logout if 401 response returned from api
-                
-                window.location.reload(true);
-            }
-
-            const error = (data && data.message) || response.statusText;
-            return Promise.reject(error);
-        }
-        setitemList([response.items])
-    }
-
-    // 강의실 입장 코드 입력
+    // 강의실 추가 코드 변경 함수
     const onClassCodeHandler = (event) => {
         setclasscode(event.currentTarget.value)
     }
 
-    // 강의실 생성 함수
-    const AddClass = () => {
-        // 유효성 검사
-        if (classCode === "") {
-            return alert('강의실 코드를 입력해주세요.')
+    // 강의실 추가 함수
+    const addClass = () => {
+        // 수강자 권한일 경우 
+        if (is_student === true) {
+            // 폼 유효성 검사
+            if (classCode === "") {
+                return alert('강의실 코드를 입력해주세요.')
+            }
+            // 강의실 입장
+            registerClassRequest()
+            .then(
+                data => {
+                    setitemList([data.items])
+                    closeModal()
+                    alert("입장되었습니다.")
+                }
+            )
         }
-        file_id = classCode;
-        // 요청 보내기 
-        const requestOptions = {
-            method: 'POST',
-            headers: authHeader(),
-            body: JSON.stringify({file_id})
-        };
-
-        fetch('/class', requestOptions)
-        .then(handleResponse)
-        .then(data => console.log(data)
-        .then(alert("입장되었습니다."))
-        .then(closeModal())
-         
-        );
-
-        setisViewModal(false)
+        // 강의자 권한일 경우
+        else {
+            // 폼 유효성 검사
+            if (classCode === "") {
+                return alert('강의실 이름을 입력해주세요.')
+            }
+            // 강의실 생성
+            addClassRequest()
+            .then(
+                data => {
+                    setitemList([data.items])
+                    closeModal()
+                    alert("생성되었습니다.")
+                }
+            )
+        }   
     }
+    
 
     return (
         <div className="HomePage">
@@ -164,7 +220,7 @@ function HomePage(props) {
                     {
                         itemList.map(function(item){
                             return (
-                                <div className="ListItem" onDoubleClick={()=>onFolderHandler(item)} key={item[0]} >
+                                <div className="ListItem" onDoubleClick={()=>openFolder(item)} key={item[0]} >
                                     <div className="ListIconBox">
                                     {
                                         item[2] === true 
@@ -182,7 +238,7 @@ function HomePage(props) {
                 </div>)
                     : (<ul className="IconList">
                     {itemList.map(item => (
-                        <li onDoubleClick={()=>onFolderHandler(item)} key={item[0]}> 
+                        <li onDoubleClick={()=>openFolder(item)} key={item[0]}> 
                             <div className="Iconbox">
                                     {
                                         item[2] === true 
@@ -198,25 +254,45 @@ function HomePage(props) {
                 </ul>)
                 }
             </div>
-            {/* 강의실 생성 모달 */}
+            {/* 강의실 추가 모달 */}
             {
                 isViewModal === true
                 && (
                     <div className="modal">
                         <div className="modal-item">
-                            <div className="modal-content">
-                                <p>강의실 입장</p>
-                                <p style={{fontSize:'12px', marginTop: '0'}}>강의실에 입장하기 위해서는 강의실 코드를 입력해주세요.</p>
-                                <input type="text" value={classCode} onChange={onClassCodeHandler} style={{margin:'10px 0'}}/>
-                                <div className="modal-button">
-                                    <button onClick={AddClass}>
-                                        입장하기
-                                    </button>
-                                    <button onClick={closeModal} style={{backgroundColor:'white'}}>
-                                        취소
-                                    </button>
-                                </div>
-                            </div>
+                            {
+                                is_student === true
+                                ? (
+                                    <div className="modal-content">
+                                        <p>강의실 입장</p>
+                                        <p style={{fontSize:'12px', marginTop: '0'}}>강의실에 입장하기 위해서는 강의실 코드를 입력해주세요.</p>
+                                        <input type="text" value={classCode} onChange={onClassCodeHandler} style={{margin:'10px 0'}}/>
+                                        <div className="modal-button">
+                                            <button onClick={addClass}>
+                                                입장하기
+                                            </button>
+                                            <button onClick={closeModal} style={{backgroundColor:'white'}}>
+                                                취소
+                                            </button>
+                                        </div>
+                                    </div>
+                                )
+                                : (
+                                    <div className="modal-content">
+                                        <p>강의실 생성</p>
+                                        <p style={{fontSize:'12px', marginTop: '0'}}>생성할 강의실 이름을 입력해주세요.</p>
+                                        <input type="text" value={classCode} onChange={onClassCodeHandler} style={{margin:'10px 0'}}/>
+                                        <div className="modal-button">
+                                            <button onClick={addClass}>
+                                                생성하기
+                                            </button>
+                                            <button onClick={closeModal} style={{backgroundColor:'white'}}>
+                                                취소
+                                            </button>
+                                        </div>
+                                    </div>
+                                )
+                            }
                         </div>
                     </div>
                 )

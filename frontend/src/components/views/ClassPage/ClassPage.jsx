@@ -65,7 +65,10 @@ function ClassPage(props) {
             const url_lect = 'api/folder/' + params.classid + '/1';
             const requestOptions = {
                 method: 'GET',
-                headers: authHeader()
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': authHeader().Authorization
+                },
             };
             fetch(url_lect, requestOptions)
             .then(
@@ -140,7 +143,10 @@ function ClassPage(props) {
                 // 강의 내에 폴더 생성
                 const requestOptions = {
                     method: 'POST',
-                    headers: authHeader(),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authHeader().Authorization
+                    },
                     body: JSON.stringify({
                         parent: folderInfo.f_id,
                         name: newFolderName,
@@ -154,7 +160,10 @@ function ClassPage(props) {
                 // 과제 내에 폴더 생성
                 const requestOptions = {
                     method: 'POST',
-                    headers: authHeader(),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authHeader().Authorization
+                    },
                     body: JSON.stringify({
                         parent: folderInfo.f_id,
                         name: newFolderName,
@@ -215,10 +224,30 @@ function ClassPage(props) {
         props.history.push(url);
     }
 
+    const linkToManagePage = () => {
+        const url = '/class/' + folderInfo.f_id.toString() + '/manage';
+        console.log(1)
+        console.log(url)
+        props.history.push(url);
+        console.log(2)
+
+    }
+
     return (
         <div>
+            {/* 강의실 이름 */}
             <div>
                 {folderInfo.f_name}
+            </div>
+            {/* 강의실 관리 버튼 */}
+            <div>
+                {
+                    is_student === false && (
+                        <div>
+                            <button onClick={linkToManagePage}>강의실 관리</button>
+                        </div>
+                    )
+                }
             </div>
             <div className="SetViewContainer">
                 <div className='SetView'>
@@ -261,17 +290,29 @@ function ClassPage(props) {
                         {
                             lectItems.map(function(item){
                                 return (
-                                    <div className="ListItem" onDoubleClick={()=>onFolderHandler(item)} key={item[0]} >
+                                    <div className="ListItem"  key={item[0]} >
                                         <div className="ListIconBox">
                                         {
                                             item[2] === true 
-                                            ? (<FontAwesomeIcon icon={faFolder} className="ListFolderIcon"/>)
-                                            : (<FontAwesomeIcon icon={faFileLines} className="ListFileIcon"/>)
+                                            ? (
+                                            <div onDoubleClick={()=>onFolderHandler(item)}>
+                                                <FontAwesomeIcon icon={faFolder} className="ListFolderIcon" />
+                                                <div className="ListNameBox">
+                                                    <p>{item[1]}</p>
+                                                </div>
+                                            </div>
+                                            )
+                                            : (
+                                            <div>
+                                                <FontAwesomeIcon icon={faFileLines} className="ListFileIcon"/>
+                                                <div className="ListNameBox">
+                                                    <p>{item[1]}</p>
+                                                </div>
+                                            </div>
+                                            )
                                         }
                                         </div>
-                                        <div className="ListNameBox">
-                                            <p>{item[1]}</p>
-                                        </div>
+                                        
                                     </div>
                                 )
                             })
@@ -281,17 +322,28 @@ function ClassPage(props) {
                     <ul className="IconList">
                     {
                         lectItems.map(item => (
-                            <li  onDoubleClick={()=>onFolderHandler(item)} key={item[0]}> 
+                            <li key={item[0]}> 
                                 <div className="Iconbox">
                                         {
                                             item[2] === true 
-                                            ? (<FontAwesomeIcon icon={faFolder} className="FolderIcon"/>)
-                                            : (<FontAwesomeIcon icon={faFileLines} className="FileIcon"/>)
+                                            ? (
+                                            <div onDoubleClick={()=>onFolderHandler(item)}>
+                                                <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
+                                                <div className="ListNameBox">
+                                                    <p>{item[1]}</p>
+                                                </div>   
+                                            </div>
+                                            )
+                                            : (
+                                            <div>
+                                                <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
+                                                <div className="ListNameBox">
+                                                    <p>{item[1]}</p>
+                                                </div> 
+                                            </div>
+                                            )
                                         }
-                                </div>
-                                <div className="ListNameBox">
-                                    <p>{item[1]}</p>
-                                </div>                     
+                                </div>            
                             </li>
                         ))
                     } 
@@ -323,16 +375,27 @@ function ClassPage(props) {
                         {
                             assignItems.map(function(item){
                                 return (
-                                    <div className="ListItem" onDoubleClick={()=>onFolderHandler(item)} key={item[0]} >
+                                    <div className="ListItem"  key={item[0]} >
                                         <div className="ListIconBox">
                                         {
                                             item[2] === true 
-                                            ? (<FontAwesomeIcon icon={faFolder} className="ListFolderIcon"/>)
-                                            : (<FontAwesomeIcon icon={faFileLines} className="ListFileIcon"/>)
+                                            ? (
+                                            <div onDoubleClick={()=>onFolderHandler(item)}>
+                                                <FontAwesomeIcon icon={faFolder} className="ListFolderIcon"/>
+                                                <div className="ListNameBox">
+                                                    <p>{item[1]}</p>
+                                                </div>
+                                            </div>
+                                            )
+                                            : (
+                                            <div>
+                                                <FontAwesomeIcon icon={faFileLines} className="ListFileIcon"/>
+                                                <div className="ListNameBox">
+                                                    <p>{item[1]}</p>
+                                                </div>
+                                            </div>
+                                            )
                                         }
-                                        </div>
-                                        <div className="ListNameBox">
-                                            <p>{item[1]}</p>
                                         </div>
                                     </div>
                                 )
@@ -343,17 +406,28 @@ function ClassPage(props) {
                     <ul className="IconList">
                     {
                         assignItems.map(item => (
-                            <li onDoubleClick={()=>onFolderHandler(item)} key={item[0]}> 
+                            <li key={item[0]}> 
                                 <div className="Iconbox">
                                         {
                                             item[2] === true 
-                                            ? (<FontAwesomeIcon icon={faFolder} className="FolderIcon"/>)
-                                            : (<FontAwesomeIcon icon={faFileLines} className="FileIcon"/>)
+                                            ? (
+                                            <div onDoubleClick={()=>onFolderHandler(item)}>
+                                                <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
+                                                <div className="ListNameBox">
+                                                    <p>{item[1]}</p>
+                                                </div>    
+                                            </div>
+                                            )
+                                            : (
+                                            <div>
+                                                <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
+                                                <div className="ListNameBox">
+                                                    <p>{item[1]}</p>
+                                                </div>  
+                                            </div>
+                                            )
                                         }
-                                </div>
-                                <div className="ListNameBox">
-                                    <p>{item[1]}</p>
-                                </div>                     
+                                </div>                 
                             </li>
                         ))
                     } 
