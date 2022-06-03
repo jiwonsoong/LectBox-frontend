@@ -1,0 +1,39 @@
+.ManageClassPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 0;
+}
+
+.MContainer {
+    width: 70vw;
+    font-size: 18px;
+}
+
+.MItem {
+    display: flex;
+    font-size: 17px;
+    padding-left: 15px;
+}
+
+.MItemTitle {
+    width: 170px;
+}
+
+.MCategory{
+    padding-bottom: 15px;
+    padding-left: 15px;
+    border-bottom: 1px solid #9e9fa1;
+    margin-bottom: 20px;
+}
+
+.MItem button{
+    all: unset;
+    margin-top: 40px;
+    font-size: 15px;
+    text-decoration: underline;
+}
+
+.MItem button:hover{
+    cursor: pointer;
+}
