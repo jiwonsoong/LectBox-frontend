@@ -180,6 +180,8 @@ function ClassPage(props) {
             .then(
                 data => {
                     setlectItems([data.items]);
+                    alert('추가되었습니다.');
+                    closeAddFolderModal();
                 }
             )
         } 
@@ -190,11 +192,12 @@ function ClassPage(props) {
             .then(
                 data => {
                     setassignItems([data.items]);
+                    
+                    alert('추가되었습니다.');
+                    closeAddFolderModal();
                 }
             )
         }
-        alert('추가되었습니다.');
-        closeAddFolderModal();
     }
     
 

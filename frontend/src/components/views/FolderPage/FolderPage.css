@@ -1,0 +1,17 @@
+.FCategory {
+    display: flex;
+    flex-direction: column;
+}
+
+.FPath {
+    margin: 10px 0 10px 0;
+    font-size: 16px;
+    display: flex;
+    color: gray;
+}
+
+.FButtonBox {
+    margin-top: 20px;
+    display: flex;
+    justify-content: right;
+}

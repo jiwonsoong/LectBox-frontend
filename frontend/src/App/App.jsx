@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { history } from '../_helpers';
 import { alertActions } from '../_actions';
 import { PrivateRoute } from '../_Pageroute';
-import { LandingPage } from '../components/views/LandingPage';
 import { HomePage } from '../components/views/HomePage';
 import { LoginPage } from '../components/views/LoginPage/LoginPage';
 import { RegisterPage } from "../components/views/RegisterPage/RegisterPage";
@@ -17,6 +16,7 @@ import { ManageClassPage } from '../components/views/ManageClassPage/ManageClass
 function App() {
     const alert = useSelector(state => state.alert);
     const dispatch = useDispatch();
+    const is_login = true;
 
     useEffect(() => {
         history.listen((location, action) => {
@@ -33,13 +33,16 @@ function App() {
             <Router history={history}>
                 <NavBar/>
                 <Switch>
-                    <Route exact path="/" component={LandingPage} />
+                    {
+                        is_login === false
+                        ? (<Route exact path="/" component={LoginPage} />)
+                        : (<Route exact path="/" component={HomePage} />)
+                    }
                     <Route path="/login" component={LoginPage} />
                     <Route path="/register" component={RegisterPage} />
                     <Route path='/user' component={HomePage} />
                     <Route exact path='/class/:classid' component={ClassPage}/>
-                    {/* <Route path='/folder/:folderid' component={FolderPage}/> */}
-                    <Route path='/folder' component={FolderPage}/>
+                    <Route path='/folder/:folderid' component={FolderPage}/>
                     <Route path='/class/:classid/manage' component={ManageClassPage}/>
                     <Redirect from="*" to="/" />
                 </Switch>

@@ -35,13 +35,15 @@ function NavBar() {
                 } */}
                 
             </div>
-            <button className='NavbarRight'>
-                {
-                    loginState===true
-                    ? (<div>{userName} ({auth})</div>)
-                    : (<Link to='/login' className="NavbarLink"><div>로그인</div></Link>)
-                }
-            </button>
+            {
+                loginState===true
+                ? (
+                    <button className='NavbarRight'>
+                        <div>{userName} ({auth})</div>
+                    </button>
+               )
+                : (<div></div>)
+            }
         </div>
     );
 }
