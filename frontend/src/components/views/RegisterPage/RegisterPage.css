@@ -1,0 +1,19 @@
+.register-group {
+    display: flex;
+    float: left;
+    margin-top: 25px;
+}
+
+.info-group{
+    display: flex;
+    margin-right: 5px;
+    height: 30px;
+    width: 150px;
+}
+
+.info-group2{
+    display: flex;
+    margin-right: 5px;
+    height: 30px;
+    width: 120px;
+}

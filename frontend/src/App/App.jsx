@@ -11,6 +11,7 @@ import { NavBar } from '../components/views/NavBar';
 import { ClassPage } from '../components/views/ClassPage';
 import { FolderPage } from '../components/views/FolderPage/FolderPage';
 import { ManageClassPage } from '../components/views/ManageClassPage/ManageClassPage';
+import { UserInfoPage } from '../components/views/UserInfoPage/UserInfoPage';
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
                     <Route exact path='/class/:classid' component={ClassPage}/>
                     <Route path='/folder/:folderid' component={FolderPage}/>
                     <Route path='/class/:classid/manage' component={ManageClassPage}/>
+                    <Route path='/userinfo' component={UserInfoPage}/>
                     <Redirect from="*" to="/" />
                 </Switch>
             </Router>

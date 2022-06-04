@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { userActions } from '../../../_actions';
+import './RegisterPage.css';
 
 function RegisterPage(props) {
     const dispatch = useDispatch();
@@ -85,38 +86,55 @@ function RegisterPage(props) {
             <form style={{ display: 'flex', flexDirection: 'column' }}
                 onSubmit={onSubmitHandler}
             >
-                <label>아이디</label>
-                <input type="text" value={Id} onChange={onIdHandler} />
-
-                <label>비밀번호</label>
-                <input type="password" value={Password} onChange={onPasswordHandler} />
-
-                <label>비밀번호 확인</label>
-                <input type="password" value={ConfirmPassword} onChange={onConfirmPasswordHandler} />
-
-                <label>수강자</label>
-                <input type="radio" value="student" onClick={onIsStudentHandler} />
-
-                <label>강의자</label>
-                <input type="radio" value="lecturer" onClick={onIsStudentHandler} />
-
-                <label>이름</label>
-                <input type="text" value={Name} onChange={onNameHandler} />
-
-                <label>이메일</label>
-                <input type="text" value={Email} onChange={onEmailHandler} />
-
-                <label>학교</label>
-                <input type="text" value={School} onChange={onSchoolHandler} />
-
-                <label>학과</label>
-                <input type="text" value={Department} onChange={onDepartmentHandler} />
+                <div className='register-group'>
+                    <label className='info-group'>아이디</label>
+                    <input className='form-control' type="text" value={Id} onChange={onIdHandler} />
+                </div>
                 
+                <div className='register-group'>
+                    <label className='info-group'>비밀번호</label>
+                    <input className='form-control' type="password" value={Password} onChange={onPasswordHandler} />
+                </div>
+                
+                <div className='register-group'>
+                    <label className='info-group'>비밀번호 확인</label>
+                    <input className='form-control' type="password" value={ConfirmPassword} onChange={onConfirmPasswordHandler} />
+                </div>
+                
+                <div className='register-group'>
+                    <label className='info-group2'>수강자</label>
+                    <input type="radio" value="student" onClick={onIsStudentHandler} />
+                </div>
+                
+                <div className='register-group'>
+                    <label className='info-group2'>강의자</label>
+                    <input type="radio" value="lecturer" onClick={onIsStudentHandler} />
+                </div>
+                
+                <div className='register-group'>
+                    <label className='info-group'>이름</label>
+                    <input className='form-control' type="text" value={Name} onChange={onNameHandler} />
+                </div>
+                
+                <div className='register-group'>
+                    <label className='info-group'>이메일</label>
+                    <input className='form-control' type="text" value={Email} onChange={onEmailHandler} />
+                </div>
+                
+                <div className='register-group'>
+                    <label className='info-group'>학교</label>
+                    <input className='form-control' type="text" value={School} onChange={onSchoolHandler} />
+                </div>
+
+                <div className='register-group'>
+                    <label className='info-group'>학과</label>
+                    <input className='form-control' type="text" value={Department} onChange={onDepartmentHandler} />
+                </div>        
                 <br />
-                <button type="submit">
+                <button className='btn btn-primary' type="submit">
                     회원 가입
                 </button>
-                <Link to="/login">취소</Link>
+                <Link to="/login" className="btn btn-link" >취소</Link>
             </form>
         </div>
     );

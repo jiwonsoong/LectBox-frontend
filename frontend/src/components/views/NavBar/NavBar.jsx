@@ -39,7 +39,7 @@ function NavBar() {
                 loginState===true
                 ? (
                     <button className='NavbarRight'>
-                        <div>{userName} ({auth})</div>
+                        <div><Link to="/userinfo">{userName} ({auth})</Link></div>
                     </button>
                )
                 : (<div></div>)

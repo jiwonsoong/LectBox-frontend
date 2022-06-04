@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
-import { faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge } from '@fortawesome/free-solid-svg-icons'
+import { faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import { authHeader } from '../../../_helpers';
 
 
@@ -19,10 +19,14 @@ function ClassPage(props) {
     const [isViewAddModal, setisViewAddModal] = useState(false); // 폴더 생성 모달 노출 여부
     const [newFolderName, setnewFolderName] = useState('') // 생성할 폴더 이름
     const [isLect, setisLect] = useState() // 생성할 폴더의 위치 (강의면 true, 과제면 false)
+    const [viewbutton, setviewbutton] =useState(false); // 폴더 수정 삭제 이동 버튼 노출 여부
+    const [Lectviewbutton, setLectviewbutton] =useState(false); // 폴더 수정 삭제 이동 버튼 노출 여부
     // 필요한 유저 정보: is_student, id
     
     // dummy data
     const is_student = false;
+
+    const item_id = "101";
 
     // 페이지 첫 렌더링 시 동작
     useEffect(() => {
@@ -129,6 +133,54 @@ function ClassPage(props) {
             .then(handleResponse)
         )
     }
+    const deleteFolder = () => {
+        if (item_id === lectItems) { //(수정 필요)
+            deleteFolderRequest()
+            .then(
+                ()=>{
+                    alert('폴더가 삭제되었습니다.');
+                }
+            )
+        } else {
+            alert('삭제 권한이 없습니다.')
+        }
+    }
+    // 폴더 삭제 요청 함수
+    const deleteFolderRequest = () => {
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            }
+        };
+        const url = '/api/forder' //+ folderInfo.f_id (수정 필요)
+
+        return (
+            fetch(url,requestOptions)
+            .then(handleResponse)
+        )
+    }
+    // 폴더 정보 수정 요청 함수
+    const EditFolderRequest = (parentType) => {
+        const requestOptions = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            },
+            body: JSON.stringify({
+                parent: folderInfo.f_id,
+                name: newFolderName,
+                type: parentType
+            })
+        };
+
+        return(
+        fetch(url,requestOptions)
+        .then(handleResponse)
+        )
+    }
     const handleResponse = (response) => {
         if (!response.status === 200) {
             if (response.status === 401) {
@@ -142,6 +194,33 @@ function ClassPage(props) {
         }
         return response;
     }
+
+    // 파일 다운로드 기능
+    /*const FileDownload = () => {
+        FileDownloadRequest()
+        .then(response) => {
+            const blob = new Blob([response.data]);
+        }
+
+    }*/
+
+    // 파일 다운로드 요청 함수
+    const FileDownloadRequest = () => {
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            }
+        };
+
+        const url = 'api/folder' + folderInfo.f_id + '/file' + faCircleInfo.file_id + '/downloads'
+
+        return (
+            fetch(url,requestOptions)
+            .then(handleResponse)
+        )
+    } 
     
     // 파일 보기 방식 변경 함수
     const onViewHandler = (e)=>{
@@ -309,8 +388,8 @@ function ClassPage(props) {
                                             <div className='ListNameBox'>
                                                 {
                                                     item[2] === true
-                                                    ? (<p onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
-                                                    : (<p>{item[1]}</p>)
+                                                    ? (<p onClick={()=>setLectviewbutton(!Lectviewbutton)} onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
+                                                    : (<p onClick={()=>setLectviewbutton(!Lectviewbutton)} onDoubleClick={()=>FileDownload(item)} >{item[1]}</p>)
                                                 }
                                             </div>
                                             <div className='ListOwner'>
@@ -330,7 +409,7 @@ function ClassPage(props) {
                                             {
                                                 item[2] === true 
                                                 ? (
-                                                <div onDoubleClick={()=>onFolderHandler(item)}>
+                                                <div onClick={()=>setLectviewbutton(!Lectviewbutton)} onDoubleClick={()=>onFolderHandler(item)}>
                                                     <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
                                                     <div className="ListNameBox">
                                                         <p>{item[1]}</p>
@@ -338,7 +417,7 @@ function ClassPage(props) {
                                                 </div>
                                                 )
                                                 : (
-                                                <div>
+                                                <div onClick={()=>setLectviewbutton(!Lectviewbutton)} onDoubleClick={()=>FileDownload(item)}>
                                                     <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
                                                     <div className="ListNameBox">
                                                         <p>{item[1]}</p>
@@ -351,6 +430,15 @@ function ClassPage(props) {
                             ))
                         } 
                         </ul>)
+                    }
+                    {
+                    Lectviewbutton === true && (
+                        <div className='EditfolderButton'>
+                            <button onClick={deleteFolder}>삭제</button>
+                            <button>수정</button>
+                            <button>이동</button>
+                        </div>
+                    ) 
                     }
                     </div>
                 </div>
@@ -391,8 +479,8 @@ function ClassPage(props) {
                                             <div className='ListNameBox'>
                                                 {
                                                     item[2] === true
-                                                    ? (<p onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
-                                                    : (<p>{item[1]}</p>)
+                                                    ? (<p onClick={()=>setviewbutton(!viewbutton)} onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
+                                                    : (<p onClick={()=>setviewbutton(!viewbutton)} onDoubleClick={()=>FileDownload(item)}>{item[1]}</p>)
                                                 }
                                             </div>
                                             <div className='ListOwner'>
@@ -412,7 +500,7 @@ function ClassPage(props) {
                                             {
                                                 item[2] === true 
                                                 ? (
-                                                <div onDoubleClick={()=>onFolderHandler(item)}>
+                                                <div onClick={()=>setviewbutton(!viewbutton)} onDoubleClick={()=>onFolderHandler(item)}>
                                                     <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
                                                     <div className="ListNameBox">
                                                         <p>{item[1]}</p>
@@ -420,7 +508,7 @@ function ClassPage(props) {
                                                 </div>
                                                 )
                                                 : (
-                                                <div>
+                                                <div onClick={()=>setviewbutton(!viewbutton)} onDoubleClick={()=>FileDownload(item)}>
                                                     <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
                                                     <div className="ListNameBox">
                                                         <p>{item[1]}</p>
@@ -433,6 +521,15 @@ function ClassPage(props) {
                             ))
                         } 
                         </ul>)
+                    }
+                    {
+                    viewbutton === true  &&(
+                        <div className='EditfolderButton'>
+                            <button onClick={deleteFolder}>삭제</button>
+                            <button>수정</button>
+                            <button>이동</button>
+                        </div>
+                    ) 
                     }
                     </div>
                 </div>

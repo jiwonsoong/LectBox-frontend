@@ -41,3 +41,11 @@
     padding: 8px 15px 8px 15px;
     margin-bottom: 10px;
 }
+
+.EditfolderButton {
+    display: flex;
+}
+
+.EditfolderButton button:hover{
+    cursor: pointer;
+}

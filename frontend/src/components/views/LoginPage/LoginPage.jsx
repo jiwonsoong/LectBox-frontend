@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { userActions } from '../../../_actions';
+import './LoginPage.css';
 
 function LoginPage() {
     const [inputs, setInputs] = useState({
@@ -36,7 +37,7 @@ function LoginPage() {
     }
 
     return (
-        <div className="col-lg-8 offset-lg-2">
+        <div className="loginpage">
             <form name="form" onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>이메일</label>
