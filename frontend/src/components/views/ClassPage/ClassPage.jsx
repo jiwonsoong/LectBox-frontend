@@ -3,11 +3,7 @@ import React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
-<<<<<<< HEAD
-import { faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
-=======
 import { faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus } from '@fortawesome/free-solid-svg-icons'
->>>>>>> a5a2786b20a80c103b7bcec4c66af42959aed2a5
 import { authHeader } from '../../../_helpers';
 import { folder } from '../../../_reducers/folder.reducer';
 
@@ -23,12 +19,9 @@ function ClassPage(props) {
     const [isViewAddModal, setisViewAddModal] = useState(false); // 폴더 생성 모달 노출 여부
     const [newFolderName, setnewFolderName] = useState('') // 생성할 폴더 이름
     const [isLect, setisLect] = useState() // 생성할 폴더의 위치 (강의면 true, 과제면 false)
-<<<<<<< HEAD
     const [viewbutton, setviewbutton] =useState(false); // 폴더 수정 삭제 이동 버튼 노출 여부
     const [Lectviewbutton, setLectviewbutton] =useState(false); // 폴더 수정 삭제 이동 버튼 노출 여부
-=======
     const [newFile, setnewFile] = useState() // 업로드할 파일
->>>>>>> a5a2786b20a80c103b7bcec4c66af42959aed2a5
     // 필요한 유저 정보: is_student, id
     
     // dummy data
@@ -193,7 +186,6 @@ function ClassPage(props) {
             .then(handleResponse)
         )
     }
-<<<<<<< HEAD
     const deleteFolder = () => {
         if (item_id === lectItems) { //(수정 필요)
             deleteFolderRequest()
@@ -226,7 +218,22 @@ function ClassPage(props) {
     const EditFolderRequest = (parentType) => {
         const requestOptions = {
             method: 'PUT',
-=======
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            },
+            body: JSON.stringify({
+                parent: folderInfo.f_id,
+                name: newFolderName,
+                type: parentType
+            })
+        };
+
+        return(
+        fetch(url,requestOptions)
+        .then(handleResponse)
+        )
+    }
     // 파일 업로드 요청 함수
     const addFileRequest = (formData)=>{
         let parentId = '';
@@ -241,23 +248,11 @@ function ClassPage(props) {
 
         const requestOptions = {
             method: 'POST',
->>>>>>> a5a2786b20a80c103b7bcec4c66af42959aed2a5
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': authHeader().Authorization
             },
             body: JSON.stringify({
-<<<<<<< HEAD
-                parent: folderInfo.f_id,
-                name: newFolderName,
-                type: parentType
-            })
-        };
-
-        return(
-        fetch(url,requestOptions)
-        .then(handleResponse)
-=======
                 parent: parentId,
                 FILES: formData,
                 is_protected: false
@@ -267,7 +262,6 @@ function ClassPage(props) {
         return (
             fetch(url, requestOptions)
             .then(handleResponse)
->>>>>>> a5a2786b20a80c103b7bcec4c66af42959aed2a5
         )
     }
     const handleResponse = (response) => {

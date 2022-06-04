@@ -43,14 +43,9 @@ function App() {
                     <Route path="/register" component={RegisterPage} />
                     <Route path='/user' component={HomePage} />
                     <Route exact path='/class/:classid' component={ClassPage}/>
-<<<<<<< HEAD
-                    <Route path='/folder/:folderid' component={FolderPage}/>
-                    <Route path='/class/:classid/manage' component={ManageClassPage}/>
-                    <Route path='/userinfo' component={UserInfoPage}/>
-=======
                     <Route exact path='/folder/:folderid' component={FolderPage}/>
                     <Route exact path='/class/:classid/manage' component={ManageClassPage}/>
->>>>>>> a5a2786b20a80c103b7bcec4c66af42959aed2a5
+                    <Route path='/userinfo' component={UserInfoPage}/>
                     <Redirect from="*" to="/" />
                 </Switch>
             </Router>
