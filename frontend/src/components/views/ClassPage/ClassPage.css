@@ -41,3 +41,13 @@
     padding: 8px 15px 8px 15px;
     margin-bottom: 10px;
 }
+
+.PlusContainer {
+    display: flex;
+    width: 50px;
+    justify-content: space-between;
+}
+
+.PlusContainer input{
+    display: none;
+}
