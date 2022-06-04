@@ -1,11 +1,15 @@
 import './ClassPage.css';
 import React from 'react';
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
+<<<<<<< HEAD
 import { faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
+=======
+import { faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus } from '@fortawesome/free-solid-svg-icons'
+>>>>>>> a5a2786b20a80c103b7bcec4c66af42959aed2a5
 import { authHeader } from '../../../_helpers';
+import { folder } from '../../../_reducers/folder.reducer';
 
 
 function ClassPage(props) {
@@ -19,8 +23,12 @@ function ClassPage(props) {
     const [isViewAddModal, setisViewAddModal] = useState(false); // 폴더 생성 모달 노출 여부
     const [newFolderName, setnewFolderName] = useState('') // 생성할 폴더 이름
     const [isLect, setisLect] = useState() // 생성할 폴더의 위치 (강의면 true, 과제면 false)
+<<<<<<< HEAD
     const [viewbutton, setviewbutton] =useState(false); // 폴더 수정 삭제 이동 버튼 노출 여부
     const [Lectviewbutton, setLectviewbutton] =useState(false); // 폴더 수정 삭제 이동 버튼 노출 여부
+=======
+    const [newFile, setnewFile] = useState() // 업로드할 파일
+>>>>>>> a5a2786b20a80c103b7bcec4c66af42959aed2a5
     // 필요한 유저 정보: is_student, id
     
     // dummy data
@@ -32,9 +40,15 @@ function ClassPage(props) {
     useEffect(() => {
         // dummy data 
         setfolderInfo({
-            f_id: 12345,
-            f_name: '클라우드 컴퓨팅',
-            made_by: 'user2'
+            parent: 0,
+            id: 12345,
+            made_by: 'user2',
+            name: '클라우드 컴퓨팅',
+            max_volume: 0,
+            pres_volume: 0,
+            type: 0,
+            lectureId: '',
+            assignId: ''
         });
         setlectItems([
             [101, '1주차', true, '김재홍'],
@@ -50,38 +64,73 @@ function ClassPage(props) {
         /** 
          * 백엔드랑 연동 시
          */ 
-
-        // 강의 폴더 정보 요청
-        // lectureRequest()
-        // .then(
-        //     data => {
-        //         // 강의 폴더 정보
-        //         setlectItems([data.items]);
-        //         // 강의실 정보 
-        //         setfolderInfo({
-        //             f_id: data.id,
-        //             f_name: data.name,
-        //             made_by: data.made_by
-        //         })
-        //     }
-        // )
+        // setPage();
         
-        // // 과제 폴더 정보 요청
-        // assignRequest()
-        // .then(
-        //     data => { 
-        //         // 과제 폴더 정보
-        //         assignItems([data.items]); 
-        //     }
-        // )
     }, [])
+
+    // 강의실 정보, 강의 폴더 정보, 과제 폴더 정보 reset 함수
+    const setPage = ()=>{
+        // 강의실 정보 요청
+        folderInfoRequest()
+        .then(
+            data=>{
+                setfolderInfo({
+                    parent: data.parent,
+                    id: data.id,
+                    made_by: data.made_by,
+                    name: data.name,
+                    max_volume: data.max_volume,
+                    pres_volume: data.pres_volume,
+                    type: data.type,
+                    lectureId: data.items[0][3],
+                    assignId: data.item[1][3]
+                });
+            }
+        )
+        .then(
+            ()=>{
+                // 강의 폴더 정보 요청
+                lectureRequest()
+                .then(
+                    data => {
+                        setlectItems([data.items]);
+                    }
+                )
+                // 과제 폴더 정보 요청
+                assignRequest()
+                .then(
+                    data => { 
+                        // 과제 폴더 정보
+                        assignItems([data.items]); 
+                    }
+                )
+            }
+        )
+    }
 
     /**
      * 요청
      */
+    // 강의실 정보 요청 함수 
+    const folderInfoRequest = ()=>{
+        const url = 'api/folder/' + params.classid;
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            }
+        };
+
+        return (
+            fetch(url, requestOptions)
+            .then(handleResponse)
+        )
+    }
     // 강의 폴더 정보 요청 함수
     const lectureRequest = () => {
-        const url = 'api/folder/' + params.classid + '/1';
+        const url = 'api/folder/' + folderInfo.lectureId ;
 
         const requestOptions = {
             method: 'GET',
@@ -98,7 +147,7 @@ function ClassPage(props) {
     }
     // 과제 폴더 정보 요청 함수
     const assignRequest = () => {
-        const url = 'api/folder/' + params.classid + '/2';
+        const url = 'api/folder/' + folderInfo.assignId;
 
         const requestOptions = {
             method: 'GET',
@@ -114,7 +163,18 @@ function ClassPage(props) {
         )
     }
     // 폴더 생성 요청 함수
-    const addFolderRequest = (parentType) => {
+    const addFolderRequest = () => {
+        let parentId = '';
+        let parentType = '';
+
+        if (isLect === true) {
+            parentId = folderInfo.lectureid;
+            parentType = 1;
+        } else {
+            parentId = folderInfo.assignId;
+            parentType = 2;
+        }
+
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -122,7 +182,7 @@ function ClassPage(props) {
                 'Authorization': authHeader().Authorization
             },
             body: JSON.stringify({
-                parent: folderInfo.f_id,
+                parent: parentId,
                 name: newFolderName,
                 type: parentType
             })
@@ -133,6 +193,7 @@ function ClassPage(props) {
             .then(handleResponse)
         )
     }
+<<<<<<< HEAD
     const deleteFolder = () => {
         if (item_id === lectItems) { //(수정 필요)
             deleteFolderRequest()
@@ -165,11 +226,28 @@ function ClassPage(props) {
     const EditFolderRequest = (parentType) => {
         const requestOptions = {
             method: 'PUT',
+=======
+    // 파일 업로드 요청 함수
+    const addFileRequest = (formData)=>{
+        let parentId = '';
+
+        if (isLect === true) {
+            parentId = folderInfo.lectureid;
+        } else {
+            parentId = folderInfo.assignId;
+        }
+
+        const url = '/api/folder/' + parentId.toString() + '/file/';
+
+        const requestOptions = {
+            method: 'POST',
+>>>>>>> a5a2786b20a80c103b7bcec4c66af42959aed2a5
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': authHeader().Authorization
             },
             body: JSON.stringify({
+<<<<<<< HEAD
                 parent: folderInfo.f_id,
                 name: newFolderName,
                 type: parentType
@@ -179,6 +257,17 @@ function ClassPage(props) {
         return(
         fetch(url,requestOptions)
         .then(handleResponse)
+=======
+                parent: parentId,
+                FILES: formData,
+                is_protected: false
+            })
+        };
+
+        return (
+            fetch(url, requestOptions)
+            .then(handleResponse)
+>>>>>>> a5a2786b20a80c103b7bcec4c66af42959aed2a5
         )
     }
     const handleResponse = (response) => {
@@ -252,34 +341,15 @@ function ClassPage(props) {
             return alert('폴더명을 입력하세요.')
         } 
         
-        // 강의 폴더 내에 생성
-        if(isLect===true) {
-            const parentType = 1;
-            addFolderRequest(parentType)
-            .then(
-                data => {
-                    setlectItems([data.items]);
-                    alert('추가되었습니다.');
-                    closeAddFolderModal();
-                }
-            )
-        } 
-        // 과제 폴더 내에 생성
-        else {
-            const parentType = 2;
-            addFolderRequest(parentType)
-            .then(
-                data => {
-                    setassignItems([data.items]);
-                    
-                    alert('추가되었습니다.');
-                    closeAddFolderModal();
-                }
-            )
-        }
+        addFolderRequest()
+        .then(
+            () => {
+                setPage();
+                alert('추가되었습니다.');
+                closeAddFolderModal();
+            }
+        )
     }
-    
-
     // 생성할 폴더의 부모 폴더 설정 함수
     const newParentIsLect = ()=>{
         setisLect(true);
@@ -287,12 +357,10 @@ function ClassPage(props) {
     const newParentIsAssign = ()=>{
         setisLect(false);
     }
-    
     // 생성할 폴더 이름 설정 함수
     const onFolderNameHandler = (e) => {
         setnewFolderName(e.currentTarget.value);
     }
-
     // 폴더 생성 모달창 노출 설정 함수
     const viewAddFolderModal = () => {
         setisViewAddModal(true)
@@ -301,6 +369,36 @@ function ClassPage(props) {
         setisViewAddModal(false)
     }
 
+    /**
+     * 파일 업로드 기능
+     */
+    // input type="file" 태그 클릭 위함
+    const selectFile = useRef();
+    // 업로드할 파일 입력 함수
+    const onFileHandler = (event)=>{
+        setnewFile(event.target.files[0]);
+        onFileSubmitHandler();
+    }
+    // 파일 업로드 함수
+    const onFileSubmitHandler = ()=> {
+        // event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('file', newFile);
+
+        addFileRequest(formData)
+        .then(
+            data => { 
+                setPage();
+                alert('업로드되었습니다.');
+            },
+            error=>{
+                alert('업로드에 실패하였습니다.')
+            }
+        )
+
+    }
+    
 
     /**
      * 다른 페이지 이동 
@@ -312,7 +410,7 @@ function ClassPage(props) {
     }
     // 강의실 관리 페이지 이동 함수 
     const linkToManagePage = () => {
-        const url = '/class/' + folderInfo.f_id.toString() + '/manage';
+        const url = '/class/' + folderInfo.id.toString() + '/manage';
         props.history.push(url);
     }
 
@@ -322,7 +420,7 @@ function ClassPage(props) {
             <div className="CContainer">
                 {/* 강의실 이름 */}
                 <div className='CCategory'>
-                    <div className='Category'>{folderInfo.f_name}</div>
+                    <div className='Category'>{folderInfo.name}</div>
                     {/* 강의실 관리 버튼 */}
                     {
                         is_student === false && (
@@ -354,13 +452,24 @@ function ClassPage(props) {
                 <div className='CItem'>
                     <div className='ItemTitle'>
                         <div>강의</div>
-                        {/* 폴더 생성 버튼 */}
-                        <div onClick={newParentIsLect}>
-                            {
-                                is_student === false && (
-                                    <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
-                                )
-                            }
+                        <div className='PlusContainer'>
+                            {/* 폴더 생성 버튼 */}
+                            <div onClick={newParentIsLect}>
+                                {
+                                    is_student === false && (
+                                        <div className="CategoryPlusIcon" title='폴더 생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
+                                    )
+                                }
+                            </div>
+                            {/* 파일 업로드 버튼 */}
+                            <div onClick={newParentIsLect}>
+                                <form onSubmit={onFileSubmitHandler}>
+                                    <div className="CategoryPlusIcon" title='파일 업로드' onClick={()=>{selectFile.current.click()}}>
+                                        <FontAwesomeIcon icon={faFileCirclePlus} />
+                                        <input type='file' ref={selectFile} onChange={onFileHandler}></input>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                     
@@ -446,13 +555,24 @@ function ClassPage(props) {
                 <div className='CItem'>
                     <div className='ItemTitle'>
                         <div>과제</div>
-                        {/* 폴더 생성 버튼 */}
-                        <div onClick={newParentIsAssign}>
-                            {
-                                is_student === false && (
-                                    <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
-                                )
-                            }
+                        <div className='PlusContainer'>
+                            {/* 폴더 생성 버튼 */}
+                            <div onClick={newParentIsAssign}>
+                                {
+                                    is_student === false && (
+                                        <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
+                                    )
+                                }
+                            </div>
+                            {/* 파일 업로드 버튼 */}
+                            <div onClick={newParentIsAssign}>
+                                <form onSubmit={onFileSubmitHandler}>
+                                    <div className="CategoryPlusIcon" title='파일 업로드' onClick={()=>{selectFile.current.click()}}>
+                                        <FontAwesomeIcon icon={faFileCirclePlus} />
+                                        <input type='file' ref={selectFile} onChange={onFileHandler}></input>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                     

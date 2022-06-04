@@ -22,14 +22,19 @@ function HomePage(props) {
     // 페이지 첫 렌더링 시 동작
     useEffect(() => {
         // 폴더 정보 요청하여 강의실 리스트 생성
-        // folderRequest()
-        // .then(
-        //     data => {
-        //         setitemList([data.items]);
-        //     }
-        // )
+        // setPage();
         
     }, [])
+
+    // 폴더 정보 reset 함수
+    const setPage = ()=>{
+        folderRequest()
+        .then(
+            data => {
+                setitemList([data.items]);
+            }
+        )
+    }
 
     /**
      * 요청
@@ -45,24 +50,24 @@ function HomePage(props) {
         };
 
         return (
-            fetch('api/class', requestOptions)
+            fetch('api/class-list', requestOptions)
             .then(handleResponse)
         )
     };
 
     // 강의실 입장 요청 함수
     const registerClassRequest = () => {
+        const url = 'api/class-entrance/' + classCode.toString();
         const requestOptions = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': authHeader().Authorization
-            },
-            body: JSON.stringify({ classCode })
+            }
         };
 
         return (
-            fetch('api/class', requestOptions)
+            fetch(url, requestOptions)
             .then(handleResponse)
         )
     }
@@ -154,7 +159,7 @@ function HomePage(props) {
             registerClassRequest()
             .then(
                 data => {
-                    setitemList([data.items])
+                    setPage();
                     closeModal()
                     alert("입장되었습니다.")
                 }
@@ -170,7 +175,7 @@ function HomePage(props) {
             addClassRequest()
             .then(
                 data => {
-                    setitemList([data.items])
+                    setPage();
                     closeModal()
                     alert("생성되었습니다.")
                 }

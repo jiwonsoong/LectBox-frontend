@@ -42,10 +42,21 @@
     margin-bottom: 10px;
 }
 
+<<<<<<< HEAD
 .EditfolderButton {
     display: flex;
 }
 
 .EditfolderButton button:hover{
     cursor: pointer;
+=======
+.PlusContainer {
+    display: flex;
+    width: 50px;
+    justify-content: space-between;
+}
+
+.PlusContainer input{
+    display: none;
+>>>>>>> a5a2786b20a80c103b7bcec4c66af42959aed2a5
 }

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import './FolderPage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
-import { faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge } from '@fortawesome/free-solid-svg-icons'
+import { faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus } from '@fortawesome/free-solid-svg-icons'
 import { authHeader } from '../../../_helpers';
 
 function FolderPage (props) {
@@ -11,12 +11,15 @@ function FolderPage (props) {
     const [sort, setsort] = useState('name'); // time, name
     const [isViewAddModal, setisViewAddModal] = useState(false); // 폴더 생성 모달 노출 여부
     const [newFolderName, setnewFolderName] = useState('') // 생성할 폴더 이름
+    const [newFile, setnewFile] = useState() // 업로드할 파일
     const [folderInfo, setfolderInfo] = useState({
-        f_id: 44444,
-        f_name: '1주차',
+        parent: 0,
+        id: 44444,
         made_by: 'user2',
-        class: '클라우드 컴퓨팅',
-        path: '클라우드 컴퓨팅>1주차'
+        name: '1주차',
+        max_volume: 0,
+        pres_volume: 0,
+        type: 0
     }); // 현재 폴더 정보
     const [folderItems, setfolderItems] = useState([]) // 폴더 안 하위 내용 
     const [folderPath, setfolderPath] = useState([]) // 폴더 경로
@@ -25,24 +28,20 @@ function FolderPage (props) {
     const is_student = false;
 
     // 필요한 데이터:
-    // 폴더 아이디, 폴더 이름, 과목 이름, 경로, 유저 아이디, 유저 권한, 부모 폴더 아이디
-
-    // 폴더 정보 요청
-    // 과목, 폴더 경로 띄우기
-    // 보기, 정렬 방식
-    // 폴더 목록 보이기
-    // 폴더 추가, 파일 추가
+    // 유저 아이디, 유저 권한, 부모 폴더 아이디
 
     // 페이지 첫 렌더링 시 동작
     useEffect(()=>{
         setfolderInfo({
-            f_id: 44444,
-            f_name: '1주차',
+            parent: 0,
+            id: 44444,
             made_by: 'user2',
-            class: '클라우드 컴퓨팅',
-            path: '클라우드 컴퓨팅>1주차'
+            name: '1주차',
+            max_volume: 0,
+            pres_volume: 0,
+            type: 0
         });
-        const pathList = folderInfo.path.split('>');
+        const pathList = '클라우드 컴퓨팅>1주차'.split('>');
         setfolderPath(pathList)
         setfolderItems([
             [111, '숙제1_고병후', false, '고병후'],
@@ -50,23 +49,14 @@ function FolderPage (props) {
             [113, '숙제1_연동현', false, '연동현'],
             [114, '숙제1_이재호', false, '이재호'],
             [115, '숙제1_조민식', false, '조민식'],
+            [116, 'test', true, '김재홍'],
         ])
 
 
         /**
          * 백엔드랑 연동 시
          */
-        // folderRequest()
-        // .then(
-        //     data=>{
-        //         setfolderInfo({
-        //             f_id: data.id,
-        //             f_name: data.name,
-        //             made_by: data.made_by
-        //         });
-        //         setfolderItems(data.items);
-        //     }
-        // )
+        // setFolder();
 
         // folderPathRequest()
         // .then(
@@ -77,6 +67,24 @@ function FolderPage (props) {
         // )
 
     }, [])
+
+    const setFolder = ()=>{
+        folderRequest()
+        .then(
+            data=>{
+                setfolderInfo({
+                    parent: data.parent,
+                    id: data.id,
+                    made_by: data.made_by,
+                    name: data.name,
+                    max_volume: data.max_volume,
+                    pres_volume: data.pres_volume,
+                    type: data.type,
+                });
+                setfolderItems(data.items);
+            }
+        )
+    }
 
     /**
      * 요청
@@ -124,7 +132,7 @@ function FolderPage (props) {
                 'Authorization': authHeader().Authorization
             },
             body: JSON.stringify({
-                parent: folderInfo.f_id,
+                parent: folderInfo.id,
                 name: newFolderName,
                 type: 1
             })
@@ -132,6 +140,28 @@ function FolderPage (props) {
 
         return (
             fetch('/api/folder', requestOptions)
+            .then(handleResponse)
+        )
+    }
+    // 파일 업로드 요청 함수
+    const addFileRequest = (formData)=>{
+        const url = '/api/folder/' + folderInfo.id.toString() + '/file/';
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            },
+            body: JSON.stringify({
+                parent: folderInfo.id,
+                FILES: formData,
+                is_protected: false
+            })
+        };
+
+        return (
+            fetch(url, requestOptions)
             .then(handleResponse)
         )
     }
@@ -181,13 +211,13 @@ function FolderPage (props) {
         } 
         
         addFolderRequest()
-            .then(
-                data => {
-                    setlectItems([data.items]);
-                    alert('추가되었습니다.');
-                    closeAddFolderModal();
-                }
-            )
+        .then(
+            data => {
+                setFolder();
+                alert('추가되었습니다.');
+                closeAddFolderModal();
+            }
+        )
     }
     // 생성할 폴더 이름 설정 함수
     const onFolderNameHandler = (e) => {
@@ -201,15 +231,55 @@ function FolderPage (props) {
         setisViewAddModal(false)
     }
 
+
+    /**
+     * 파일 업로드 기능
+     */
+    // input type="file" 태그 클릭 위함
+    const selectFile = useRef();
+    // 업로드할 파일 입력 함수
+    const onFileHandler = (event)=>{
+        setnewFile(event.target.files[0]);
+        onFileSubmitHandler();
+    }
+    // 파일 업로드 함수
+    const onFileSubmitHandler = ()=> {
+        // event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('file', newFile);
+
+        addFileRequest(formData)
+        .then(
+            data => { 
+                setFolder();
+                alert('업로드되었습니다.');
+            },
+            error=>{
+                alert('업로드에 실패하였습니다.')
+            }
+        )
+
+    }
+
+    /**
+     * 다른 페이지 이동 
+     */
+    // 폴더 열기 함수
+    const onFolderHandler = (folder) => {
+        const url = '/folder/' + folder[0];
+        props.history.push(url);
+    }
+
     return (
         <div className="ClassPage">
             <div className="CContainer">
                 <div className='FCategory'>
-                    <div className='Category'>{folderInfo.f_name}</div>
+                    <div className='Category'>{folderInfo.name}</div>
                     <div className="FPath">
                         {
                             folderPath.map(function(item){
-                                if (item === folderInfo.f_name) {
+                                if (item === folderInfo.name) {
                                     return (<div key={item}>{item}</div>)
                                 }
                                 else {
@@ -240,12 +310,22 @@ function FolderPage (props) {
                     </div>
                 </div>
                 <div className="FButtonBox">
-                    {/* 폴더 생성 버튼 */}
-                    {
-                        is_student === false && (
-                            <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
-                        )
-                    }
+                    <div className='PlusContainer'>
+                        {/* 폴더 생성 버튼 */}
+                        {
+                            is_student === false && (
+                                <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
+                            )
+                        }
+                        {/* 파일 업로드 버튼 */}
+                        <form onSubmit={onFileSubmitHandler}>
+                            <div className="CategoryPlusIcon" title='파일 업로드' onClick={()=>{selectFile.current.click()}}>
+                                <FontAwesomeIcon icon={faFileCirclePlus} />
+                                <input type='file' ref={selectFile} onChange={onFileHandler}></input>
+                            </div>
+                        </form>
+                    </div>
+                    
                 </div>
                 <div className="Views">
                     {
