@@ -1,0 +1,43 @@
+.ClassPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 0;
+}
+
+.CContainer {
+    width: 70vw;
+    font-size: 18px;
+}
+
+.CCategory {
+    padding: 0 15px 0 15px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.CCategory .Category {
+    margin-right: 20px;
+    font-size: 22px;
+}
+
+.CCategory .CCIcon{
+    color: gray;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.CItem {
+    margin-top: 20px;
+}
+
+.ItemTitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    border-bottom: 1px solid #9e9fa1;
+    padding: 8px 15px 8px 15px;
+    margin-bottom: 10px;
+}

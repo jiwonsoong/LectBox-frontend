@@ -38,7 +38,8 @@ function App() {
                     <Route path="/register" component={RegisterPage} />
                     <Route path='/user' component={HomePage} />
                     <Route exact path='/class/:classid' component={ClassPage}/>
-                    <Route path='/folder/:folderid' component={FolderPage}/>
+                    {/* <Route path='/folder/:folderid' component={FolderPage}/> */}
+                    <Route path='/folder' component={FolderPage}/>
                     <Route path='/class/:classid/manage' component={ManageClassPage}/>
                     <Redirect from="*" to="/" />
                 </Switch>

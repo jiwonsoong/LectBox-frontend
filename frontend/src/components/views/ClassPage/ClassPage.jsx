@@ -4,99 +4,131 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
-import { faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge } from '@fortawesome/free-solid-svg-icons'
+import { faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge } from '@fortawesome/free-solid-svg-icons'
 import { authHeader } from '../../../_helpers';
 
 
 function ClassPage(props) {
-    const now = useSelector(rootReducer => rootReducer.folder);
+    // 컴포넌트 State
     const [view, setview] = useState('icon'); // icon, list
     const [sort, setsort] = useState('name'); // time, name
     const { params } = props.match
-    const [lectItems, setlectItems] = useState([]);
-    const [assignItems, setassignItems] = useState([]);
-    const [folderInfo, setfolderInfo] = useState({});
-    const [isViewAddModal, setisViewAddModal] = useState(false);
-    const [newFolderName, setnewFolderName] = useState('')
-    const [newParent, setnewParent] = useState('Lecture') // Lecture, Assignment
-
-    // const user = JSON.parse(localStorage.getItem('user'));
-    // const is_student = user.is_student;
+    const [lectItems, setlectItems] = useState([]); // 강의 폴더의 하위 내용
+    const [assignItems, setassignItems] = useState([]); // 과제 폴더의 하위 내용
+    const [folderInfo, setfolderInfo] = useState({}); // 현재 폴더 정보
+    const [isViewAddModal, setisViewAddModal] = useState(false); // 폴더 생성 모달 노출 여부
+    const [newFolderName, setnewFolderName] = useState('') // 생성할 폴더 이름
+    const [isLect, setisLect] = useState() // 생성할 폴더의 위치 (강의면 true, 과제면 false)
+    // 필요한 유저 정보: is_student, id
+    
+    // dummy data
     const is_student = false;
 
+    // 페이지 첫 렌더링 시 동작
     useEffect(() => {
-        const state = 'development';
+        // dummy data 
+        setfolderInfo({
+            f_id: 12345,
+            f_name: '클라우드 컴퓨팅',
+            made_by: 'user2'
+        });
+        setlectItems([
+            [101, '1주차', true, '김재홍'],
+            [102, '2주차', true, '김재홍'],
+            [201, '강의계획서', false, '김재홍']
+        ]);
+        setassignItems([
+            [301, '장고과제', true, '김재홍'],
+            [302, 'ec2과제', true, '김재홍'],
+            [401, '숙제1_홍길동', false, '홍길동']
+        ]);
 
-        if(state==='development'){
-            // dummy 데이터
-            const response = {
-                f_id: 12345,
-                f_name: '클라우드컴퓨팅',
-                made_by: '김재홍',
-                max_vol: 50,
-                pres_vol: 30
+        /** 
+         * 백엔드랑 연동 시
+         */ 
 
-            }
-
-            setfolderInfo(
-                {
-                    f_id: response.f_id,
-                    f_name: response.f_name,
-                }
-            )
-
-            setlectItems([
-                [101, '1주차', true],
-                [102, '2주차', true],
-                [201, '강의계획서', false]
-            ]);
-            
-            setassignItems([
-                [301, '장고과제', true],
-                [302, 'ec2과제', true],
-                [401, '숙제1_홍길동', false]
-            ])
-
-        } 
-        else {
-            // 백엔드랑 연동 시
-
-            // 강의 폴더 정보 요청
-            const url_lect = 'api/folder/' + params.classid + '/1';
-            const requestOptions = {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': authHeader().Authorization
-                },
-            };
-            fetch(url_lect, requestOptions)
-            .then(
-                (response) => {
-                    handleResponse(response)
-                    .then(
-                        data => {
-                            setlectItems([data.items]);
-                            setfolderInfo(
-                                {
-                                    f_id: data.id,
-                                    f_name: data.name
-                                }
-                            )
-                        },
-                        error => alert("에러입니다.")
-                    )
-                }
-            )
-            
-            // 과제 폴더 정보 요청
-            const url_assign = 'api/folder/' + params.classid + '/2';
-
-        }
-
-
+        // 강의 폴더 정보 요청
+        // lectureRequest()
+        // .then(
+        //     data => {
+        //         // 강의 폴더 정보
+        //         setlectItems([data.items]);
+        //         // 강의실 정보 
+        //         setfolderInfo({
+        //             f_id: data.id,
+        //             f_name: data.name,
+        //             made_by: data.made_by
+        //         })
+        //     }
+        // )
+        
+        // // 과제 폴더 정보 요청
+        // assignRequest()
+        // .then(
+        //     data => { 
+        //         // 과제 폴더 정보
+        //         assignItems([data.items]); 
+        //     }
+        // )
     }, [])
-    
+
+    /**
+     * 요청
+     */
+    // 강의 폴더 정보 요청 함수
+    const lectureRequest = () => {
+        const url = 'api/folder/' + params.classid + '/1';
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            },
+        };
+
+        return (
+            fetch(url, requestOptions)
+            .then(handleResponse)
+        )
+    }
+    // 과제 폴더 정보 요청 함수
+    const assignRequest = () => {
+        const url = 'api/folder/' + params.classid + '/2';
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            },
+        };
+
+        return (
+            fetch(url, requestOptions)
+            .then(handleResponse)
+        )
+    }
+    // 폴더 생성 요청 함수
+    const addFolderRequest = (parentType) => {
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            },
+            body: JSON.stringify({
+                parent: folderInfo.f_id,
+                name: newFolderName,
+                type: parentType
+            })
+        };
+
+        return (
+            fetch('/api/folder', requestOptions)
+            .then(handleResponse)
+        )
+    }
     const handleResponse = (response) => {
         if (!response.status === 200) {
             if (response.status === 401) {
@@ -131,85 +163,55 @@ function ClassPage(props) {
         }
     }
 
-    // 강의 - 폴더 추가 
+    /**
+     * 폴더 생성 기능
+     */
+    // 폴더 생성 함수
     const addFolder = (e) => {
-        console.log(newFolderName)
-        console.log(newParent)
+        // 폼 유효성 검사
         if(newFolderName==='') {
             return alert('폴더명을 입력하세요.')
         } 
-        else {
-            if(newParent==='Lecture') {
-                // 강의 내에 폴더 생성
-                const requestOptions = {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': authHeader().Authorization
-                    },
-                    body: JSON.stringify({
-                        parent: folderInfo.f_id,
-                        name: newFolderName,
-                        type: 1
-                    })
-                };
-
-                addFolderRequest(requestOptions, 1)
-    
-            } else {
-                // 과제 내에 폴더 생성
-                const requestOptions = {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': authHeader().Authorization
-                    },
-                    body: JSON.stringify({
-                        parent: folderInfo.f_id,
-                        name: newFolderName,
-                        type: 2
-                    })
-                };
-
-                addFolderRequest(requestOptions, 2)
-    
-            }
-        }
-    }
-    const addFolderRequest = (requestOptions, parent) => {
-        fetch('/api/folder', requestOptions)
-        .then((response) => {
-            handleResponse(response)
+        
+        // 강의 폴더 내에 생성
+        if(isLect===true) {
+            const parentType = 1;
+            addFolderRequest(parentType)
             .then(
                 data => {
-                    if (parent === 1) {
-                        setlectItems([data.items])
-                    } else {
-                        setassignItems([data.items])
-                    }
-                    alert('추가되었습니다.');
-                    closeAddFolderModal();
-                },
-                error => {
-                    alert("에러입니다.");
-                    closeAddFolderModal();
+                    setlectItems([data.items]);
                 }
             )
-        })
-    }
-    const newParentIsLect = ()=>{
-        setnewParent('Lecture')
-
-    }
-    const newParentIsAssign = ()=>{
-        setnewParent('Assignment')
+        } 
+        // 과제 폴더 내에 생성
+        else {
+            const parentType = 2;
+            addFolderRequest(parentType)
+            .then(
+                data => {
+                    setassignItems([data.items]);
+                }
+            )
+        }
+        alert('추가되었습니다.');
+        closeAddFolderModal();
     }
     
 
+    // 생성할 폴더의 부모 폴더 설정 함수
+    const newParentIsLect = ()=>{
+        setisLect(true);
+    }
+    const newParentIsAssign = ()=>{
+        setisLect(false);
+    }
+    
+    // 생성할 폴더 이름 설정 함수
     const onFolderNameHandler = (e) => {
-        setnewFolderName(e.currentTarget.value)
+        setnewFolderName(e.currentTarget.value);
     }
 
+    // 폴더 생성 모달창 노출 설정 함수
     const viewAddFolderModal = () => {
         setisViewAddModal(true)
     }
@@ -218,225 +220,221 @@ function ClassPage(props) {
     }
 
 
-    // 폴더 입장
-    const onFolderHandler = (item) => {
-        const url = '/folder/' + item[0];
+    /**
+     * 다른 페이지 이동 
+     */
+    // 폴더 열기 함수
+    const onFolderHandler = (folder) => {
+        const url = '/folder/' + folder[0];
         props.history.push(url);
     }
-
+    // 강의실 관리 페이지 이동 함수 
     const linkToManagePage = () => {
         const url = '/class/' + folderInfo.f_id.toString() + '/manage';
-        console.log(1)
-        console.log(url)
         props.history.push(url);
-        console.log(2)
-
     }
 
+
     return (
-        <div>
-            {/* 강의실 이름 */}
-            <div>
-                {folderInfo.f_name}
-            </div>
-            {/* 강의실 관리 버튼 */}
-            <div>
-                {
-                    is_student === false && (
-                        <div>
-                            <button onClick={linkToManagePage}>강의실 관리</button>
-                        </div>
-                    )
-                }
-            </div>
-            <div className="SetViewContainer">
-                <div className='SetView'>
-                    <div onClick={onViewHandler} className='SetViewElement'>
-                        {
-                            view === 'icon'
-                            ? (<div title="아이콘 보기"><FontAwesomeIcon icon={faTableCellsLarge} /></div>)
-                            : (<div title="리스트 보기"><FontAwesomeIcon icon={faTableList} /></div>)
-                        }
-                    </div>
-                    <div onClick={onSortHandler} className='SetViewElement'>
-                        {
-                            sort === 'time'
-                            ? (<div title="최신순"><FontAwesomeIcon icon={faArrowDown19} /></div>)
-                            : (<div title="이름순"><FontAwesomeIcon icon={faArrowDownAZ} /></div>)
-                        }
-                    </div>
-                </div>
-            </div>
-            {/* 강의란 */}
-            <div>
-                <div>강의</div>
-                {/* 폴더 생성 버튼 */}
-                <div onClick={newParentIsLect}>
+        <div className="ClassPage">
+            <div className="CContainer">
+                {/* 강의실 이름 */}
+                <div className='CCategory'>
+                    <div className='Category'>{folderInfo.f_name}</div>
+                    {/* 강의실 관리 버튼 */}
                     {
                         is_student === false && (
-                            <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
+                            <div className="CCIcon" onClick={linkToManagePage} title='강의실 관리'>
+                                <FontAwesomeIcon icon={faGear} />
+                            </div>
                         )
                     }
                 </div>
-                {/* 강의 폴더 내 보여주기 */}
-                <div className="Views">
-                {
-                    view === 'icon'
-                    ? (
-                    <div className="ListView">
-                        <div className="ListColDescription">
-                            <div>이름</div>
+                <div className="SetViewContainer">
+                    <div className='SetView'>
+                        <div onClick={onViewHandler} className='SetViewElement'>
+                            {
+                                view === 'icon'
+                                ? (<div title="아이콘 보기"><FontAwesomeIcon icon={faTableCellsLarge} /></div>)
+                                : (<div title="리스트 보기"><FontAwesomeIcon icon={faTableList} /></div>)
+                            }
                         </div>
-                        {
-                            lectItems.map(function(item){
-                                return (
-                                    <div className="ListItem"  key={item[0]} >
-                                        <div className="ListIconBox">
-                                        {
-                                            item[2] === true 
-                                            ? (
-                                            <div onDoubleClick={()=>onFolderHandler(item)}>
-                                                <FontAwesomeIcon icon={faFolder} className="ListFolderIcon" />
-                                                <div className="ListNameBox">
-                                                    <p>{item[1]}</p>
-                                                </div>
-                                            </div>
-                                            )
-                                            : (
-                                            <div>
-                                                <FontAwesomeIcon icon={faFileLines} className="ListFileIcon"/>
-                                                <div className="ListNameBox">
-                                                    <p>{item[1]}</p>
-                                                </div>
-                                            </div>
-                                            )
-                                        }
-                                        </div>
-                                        
-                                    </div>
+                        <div onClick={onSortHandler} className='SetViewElement'>
+                            {
+                                sort === 'time'
+                                ? (<div title="최신순"><FontAwesomeIcon icon={faArrowDown19} /></div>)
+                                : (<div title="이름순"><FontAwesomeIcon icon={faArrowDownAZ} /></div>)
+                            }
+                        </div>
+                    </div>
+                </div>
+                {/* 강의란 */}
+                <div className='CItem'>
+                    <div className='ItemTitle'>
+                        <div>강의</div>
+                        {/* 폴더 생성 버튼 */}
+                        <div onClick={newParentIsLect}>
+                            {
+                                is_student === false && (
+                                    <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
                                 )
-                            })
-                        }
-                    </div>)
-                    : (
-                    <ul className="IconList">
+                            }
+                        </div>
+                    </div>
+                    
+                    {/* 강의 폴더 내 보여주기 */}
+                    <div className="Views">
                     {
-                        lectItems.map(item => (
-                            <li key={item[0]}> 
-                                <div className="Iconbox">
-                                        {
-                                            item[2] === true 
-                                            ? (
-                                            <div onDoubleClick={()=>onFolderHandler(item)}>
-                                                <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
-                                                <div className="ListNameBox">
-                                                    <p>{item[1]}</p>
-                                                </div>   
+                        view === 'icon'
+                        ? (
+                        <div className="ListView">
+                            <div className="ListColDescription">
+                                <div className='ListColLeft'>이름</div>
+                                <div>소유자</div>
+                            </div>
+                            {
+                                lectItems.map(function(item){
+                                    return (
+                                        <div className="ListItem"  key={item[0]} >
+                                            <div className="ListIconBox">
+                                                {
+                                                    item[2] === true 
+                                                    ? (<FontAwesomeIcon icon={faFolder} className="ListFolderIcon" />)
+                                                    : (<FontAwesomeIcon icon={faFileLines} className="ListFileIcon"/>)
+                                                }
                                             </div>
-                                            )
-                                            : (
-                                            <div>
-                                                <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
-                                                <div className="ListNameBox">
-                                                    <p>{item[1]}</p>
-                                                </div> 
+                                            <div className='ListNameBox'>
+                                                {
+                                                    item[2] === true
+                                                    ? (<p onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
+                                                    : (<p>{item[1]}</p>)
+                                                }
                                             </div>
-                                            )
-                                        }
-                                </div>            
-                            </li>
-                        ))
-                    } 
-                    </ul>)
-                }
-                </div>
-            </div>
-            {/* 과제란 */}
-            <div>
-                <div>
-                    과제
-                </div>
-                {/* 폴더 생성 버튼 */}
-                <div onClick={newParentIsAssign}>
-                    {
-                        is_student === false && (
-                            <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
-                        )
+                                            <div className='ListOwner'>
+                                                <p>{item[3]}</p>
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>)
+                        : (
+                        <ul className="IconList">
+                        {
+                            lectItems.map(item => (
+                                <li key={item[0]}> 
+                                    <div className="Iconbox">
+                                            {
+                                                item[2] === true 
+                                                ? (
+                                                <div onDoubleClick={()=>onFolderHandler(item)}>
+                                                    <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
+                                                    <div className="ListNameBox">
+                                                        <p>{item[1]}</p>
+                                                    </div>   
+                                                </div>
+                                                )
+                                                : (
+                                                <div>
+                                                    <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
+                                                    <div className="ListNameBox">
+                                                        <p>{item[1]}</p>
+                                                    </div> 
+                                                </div>
+                                                )
+                                            }
+                                    </div>            
+                                </li>
+                            ))
+                        } 
+                        </ul>)
                     }
+                    </div>
                 </div>
-                <div className="Views">
-                {
-                    view === 'icon'
-                    ? (
-                    <div className="ListView">
-                        <div className="ListColDescription">
-                            <div>이름</div>
-                        </div>
-                        {
-                            assignItems.map(function(item){
-                                return (
-                                    <div className="ListItem"  key={item[0]} >
-                                        <div className="ListIconBox">
-                                        {
-                                            item[2] === true 
-                                            ? (
-                                            <div onDoubleClick={()=>onFolderHandler(item)}>
-                                                <FontAwesomeIcon icon={faFolder} className="ListFolderIcon"/>
-                                                <div className="ListNameBox">
-                                                    <p>{item[1]}</p>
-                                                </div>
-                                            </div>
-                                            )
-                                            : (
-                                            <div>
-                                                <FontAwesomeIcon icon={faFileLines} className="ListFileIcon"/>
-                                                <div className="ListNameBox">
-                                                    <p>{item[1]}</p>
-                                                </div>
-                                            </div>
-                                            )
-                                        }
-                                        </div>
-                                    </div>
+                {/* 과제란 */}
+                <div className='CItem'>
+                    <div className='ItemTitle'>
+                        <div>과제</div>
+                        {/* 폴더 생성 버튼 */}
+                        <div onClick={newParentIsAssign}>
+                            {
+                                is_student === false && (
+                                    <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
                                 )
-                            })
-                        }
-                    </div>)
-                    : (
-                    <ul className="IconList">
+                            }
+                        </div>
+                    </div>
+                    
+                    <div className="Views">
                     {
-                        assignItems.map(item => (
-                            <li key={item[0]}> 
-                                <div className="Iconbox">
-                                        {
-                                            item[2] === true 
-                                            ? (
-                                            <div onDoubleClick={()=>onFolderHandler(item)}>
-                                                <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
-                                                <div className="ListNameBox">
-                                                    <p>{item[1]}</p>
-                                                </div>    
+                        view === 'icon'
+                        ? (
+                        <div className="ListView">
+                            <div className="ListColDescription">
+                                <div className='ListColLeft'>이름</div>
+                                <div>소유자</div>
+                            </div>
+                            {
+                                assignItems.map(function(item){
+                                    return (
+                                        <div className="ListItem"  key={item[0]} >
+                                            <div className="ListIconBox">
+                                                {
+                                                    item[2] === true 
+                                                    ? (<FontAwesomeIcon icon={faFolder} className="ListFolderIcon" />)
+                                                    : (<FontAwesomeIcon icon={faFileLines} className="ListFileIcon"/>)
+                                                }
                                             </div>
-                                            )
-                                            : (
-                                            <div>
-                                                <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
-                                                <div className="ListNameBox">
-                                                    <p>{item[1]}</p>
-                                                </div>  
+                                            <div className='ListNameBox'>
+                                                {
+                                                    item[2] === true
+                                                    ? (<p onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
+                                                    : (<p>{item[1]}</p>)
+                                                }
                                             </div>
-                                            )
-                                        }
-                                </div>                 
-                            </li>
-                        ))
-                    } 
-                    </ul>)
-                }
+                                            <div className='ListOwner'>
+                                                <p>{item[3]}</p>
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>)
+                        : (
+                        <ul className="IconList">
+                        {
+                            assignItems.map(item => (
+                                <li key={item[0]}> 
+                                    <div className="Iconbox">
+                                            {
+                                                item[2] === true 
+                                                ? (
+                                                <div onDoubleClick={()=>onFolderHandler(item)}>
+                                                    <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
+                                                    <div className="ListNameBox">
+                                                        <p>{item[1]}</p>
+                                                    </div>    
+                                                </div>
+                                                )
+                                                : (
+                                                <div>
+                                                    <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
+                                                    <div className="ListNameBox">
+                                                        <p>{item[1]}</p>
+                                                    </div>  
+                                                </div>
+                                                )
+                                            }
+                                    </div>                 
+                                </li>
+                            ))
+                        } 
+                        </ul>)
+                    }
+                    </div>
                 </div>
-            </div>
-            {/* 폴더 생성 모달 */}
-            {
+                {/* 폴더 생성 모달 */}
+                {
                     isViewAddModal === true
                     && (
                         <div className="modal">
@@ -457,6 +455,7 @@ function ClassPage(props) {
                         </div>
                     )
                 }
+            </div>
         </div>
     )
 }

@@ -61,12 +61,13 @@
 
 
 .ListFolderIcon {
-    color: #a0c4dd;
+    color: #fdea8b;
     font-size: 17px;
 }
 
 .ListFileIcon {
     color: #2f6d98;
+    font-size: 17px;
 }
 
 .ListView {
@@ -79,6 +80,7 @@
 .ListColDescription {
     border-bottom: 1px solid #dadce0;
     padding: 10px 0 10px 80px;
+    display: flex;
 }
 
 .ListItem {
@@ -86,18 +88,37 @@
     display: flex;
     padding: 10px 10px;
 }
-.ListItem:hover {
-    cursor:pointer;
-}
 
 .ListItem .ListIconBox {
     margin: 0 10px 0 30px;
+    width: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .ListItem .ListNameBox {
     margin: 0 10px;
+    width: 600px;
+}
+.ListNameBox:hover {
+    cursor:pointer;
 }
 .ListItem .ListNameBox p{
+    margin: 0 0;
+}
+
+.ListColLeft {
+    width: 610px;
+}
+.ListColLeft p {
+    margin: 0 0;
+}
+
+.ListItem .ListOwner {
+
+}
+.ListItem .ListOwner p{
     margin: 0 0;
 }
 

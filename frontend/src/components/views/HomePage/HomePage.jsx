@@ -15,7 +15,7 @@ function HomePage(props) {
     // 필요한 유저 정보: is_student (localStorage에서 가져오기)
 
     // dummy data
-    const itemList = [['folder1','캡스톤디자인', true], ['folder2','클라우드컴퓨팅',true]]
+    const itemList = [['folder1','캡스톤디자인', true, '이원희'], ['folder2','클라우드컴퓨팅',true, '김재홍']]
     // const u_id = localStorage.getItem('user');
     const is_student = false;
 
@@ -212,7 +212,8 @@ function HomePage(props) {
                     view === 'icon'
                     ? (<div className="ListView">
                     <div className="ListColDescription">
-                        <div>강의실 이름</div>
+                        <div className='ListColLeft'>강의실 이름</div>
+                        <div>강의자</div>
                     </div>
                     {
                         itemList.map(function(item){
@@ -227,6 +228,9 @@ function HomePage(props) {
                                     </div>
                                     <div className="ListNameBox">
                                         <p>{item[1]}</p>
+                                    </div>
+                                    <div className='ListOwner'>
+                                        <p>{item[3]}</p>
                                     </div>
                                 </div>
                             )
