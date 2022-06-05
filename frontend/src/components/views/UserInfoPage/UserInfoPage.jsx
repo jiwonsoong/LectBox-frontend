@@ -7,16 +7,13 @@ function UserInfoPage(props){
 	const [UserInfo, setuserInfo] = useState({u_id: "", u_email: "", u_name: "",u_password: 
     "",change_password: "", u_school: "", u_subject: "", is_student: true});
     const [viewinput,setviewinput] =useState(false);
-    const [Id, setId] = useState("")
     const [Name, setName] = useState("")
     const [Email, setEmail] = useState("")
     const [School, setSchool] = useState("")
     const [Department, setDepartment] = useState("")
     
 
-    const onIdHandler = (event) => {
-        setId(event.currentTarget.value)
-    }
+    
     const onNameHandler = (event) => {
         setName(event.currentTarget.value)
     }
@@ -35,7 +32,7 @@ function UserInfoPage(props){
         // 폼 유효성 검사
         if (checkInputs()){
             let body = {
-                id: Id,
+                id: UserInfo.u_id,
                 pw: UserInfo.u_password,
                 is_student: UserInfo.is_student,
                 name: Name,
@@ -55,11 +52,7 @@ function UserInfoPage(props){
 
     const checkInputs = ()=>{
         
-        if (Id==="" || Name===""|| Email==="" || School===""|| Department===""){
-            alert('모든 항목을 입력해주세요.')
-            return false;
-        }
-        else if(!isEmail(Email)) {
+        if(!isEmail(Email)) {
             alert('유효하지않은 형식의 이메일입니다.')
             return false;
         }
@@ -204,8 +197,7 @@ function UserInfoPage(props){
                 </div>
                 <div className="UItem">
                     <p className="UItemTitle">아이디</p>
-                    { !viewinput && <p>{UserInfo.id}</p> }
-                    { viewinput && <input type="text" value={Id} onChange={onIdHandler}/>}
+                    <p>{UserInfo.id}</p>
                 </div>
                 <div className="UItem">
                     <p className="UItemTitle">이메일</p>
