@@ -20,6 +20,11 @@ function NavBar() {
     // 
     link = "/user"
 
+    function logout() {
+        alert('로그아웃 되었습니다.');
+        localStorage.removeItem('user');
+    }
+
     return (
         <div className='Navbar'>
             <div className='NavbarLeft'>
@@ -38,9 +43,12 @@ function NavBar() {
             {
                 loginState===true
                 ? (
-                    <button className='NavbarRight'>
-                        <div style={{color:'black', fontSize: '14px'}}><Link to="/userinfo">{userName} ({auth})</Link></div>
-                    </button>
+                    <>
+                    <div className='NavbarRight'>
+                        <button className='bt1' style={{color:'black', fontSize: '14px'}}><Link to="/userinfo">{userName} ({auth})</Link></button>
+                        <button onClick={logout} className='bt2' style={{color:'black', fontSize: '14px'}}><Link to="/login" >로그아웃</Link></button>
+                    </div>
+                    </>
                )
                 : (<div></div>)
             }

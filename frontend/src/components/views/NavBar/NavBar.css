@@ -14,10 +14,29 @@
 
 .NavbarRight {
     display:flex;
-    margin-right:100px;
+    margin-right:50px;
+    
+    padding:0;
+    background:inherit;
+    cursor:pointer;
+}
+
+.bt1 {
+    display:flex;
+    margin-right:10px;
     border:solid 1px #d0d2d4; 
     border-radius:5px;
-    padding:0;
+    padding:10;
+    background:inherit;
+    cursor:pointer;
+}
+
+.bt2 {
+    display:flex;
+    margin-right:10px;
+    border:solid 1px #d0d2d4; 
+    border-radius:5px;
+    padding:10;
     background:inherit;
     cursor:pointer;
 }
