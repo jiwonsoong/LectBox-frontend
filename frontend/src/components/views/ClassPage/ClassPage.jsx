@@ -288,7 +288,7 @@ function ClassPage(props) {
             }
         };
 
-        const url = 'api/folder' + folderInfo.f_id + '/file' + faCircleInfo.file_id + '/downloads'
+        const url = '/api/foler/' + parentId.toString() + '/file/' + selectedItem.id.toString() + '/downloads';
 
         return (
             fetch(url,requestOptions)
@@ -508,13 +508,43 @@ function ClassPage(props) {
      * 파일 다운로드 기능
      */
     // 파일 다운로드 함수
-    /*const FileDownload = () => {
+    const FileDownload = () => {
         FileDownloadRequest()
-        .then(response) => {
+        .then((response) => {
             const blob = new Blob([response.data]);
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+      
+            const filename = response.headers['content-disposition']
+            .split('filename=')[1]
+            .split(';')[0];
+      
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         }
+        )
+    }
 
-    }*/
+    /*const FileDownload = (response) => {
+        const blob = new Blob([response.data], { type: response.headers['content-type'] });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+      
+        const filename = response.headers['content-disposition']
+          .split('filename=')[1]
+          .split(';')[0];
+      
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      };*/
 
     
 
