@@ -59,3 +59,28 @@
 .PlusContainer input{
     display: none;
 }
+
+.BContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 85px;
+}
+
+.CategoryPlusIcon {
+    align-items: center;
+}
+
+.DeleteContainer {
+    color: gray;
+}
+
+.EditfolderButton {
+    display: flex;
+    width: 25px;
+    justify-content: space-between;
+}
+.DE:hover{
+    color: black;
+    cursor: pointer;
+}

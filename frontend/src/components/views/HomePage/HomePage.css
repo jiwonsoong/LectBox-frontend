@@ -123,22 +123,26 @@
 }
 
 .FolderIcon {
-    color: #a0c4dd;
-    font-size: 100px;
-    
+    color: #fdea8b;
+    font-size: 60px;
 }
 
 .FileIcon {
     color: #2f6d98;
+    font-size: 60px;
 }
 
 .IconList {
+    width: 70vw;
     display: flex;
+    flex-wrap: wrap;
 }
 
 .IconList li {
-    flex: 20% 0 0;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .IconList li:hover {
@@ -151,8 +155,12 @@ ul {
     list-style: none;
 }
 
-.IconList .ListIconBox {
-    margin: 0 10px 0 30px;
+.IconList .Iconbox {
+    margin: 0 0 10px 0;
+}
+
+.IconNameBox p {
+    font-size: 16px;
 }
 
 .modal {
@@ -186,6 +194,7 @@ ul {
     align-items: center;
     justify-content: space-around;
     align-content: space-between;
+    border: 0;
   }
   .modal .modal-item .modal-button {
     flex: 1;

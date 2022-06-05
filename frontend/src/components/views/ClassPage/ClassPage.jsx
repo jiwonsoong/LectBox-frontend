@@ -3,14 +3,14 @@ import React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
-import { faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus } from '@fortawesome/free-solid-svg-icons'
+import { faTrashCan, faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus } from '@fortawesome/free-solid-svg-icons'
 import { authHeader } from '../../../_helpers';
 import { folder } from '../../../_reducers/folder.reducer';
 
 
 function ClassPage(props) {
     // 컴포넌트 State
-    const [view, setview] = useState('icon'); // icon, list
+    const [view, setview] = useState('list'); // icon, list
     const [sort, setsort] = useState('name'); // time, name
     const { params } = props.match
     const [lectItems, setlectItems] = useState([]); // 강의 폴더의 하위 내용
@@ -21,13 +21,13 @@ function ClassPage(props) {
     const [isLect, setisLect] = useState() // 생성할 폴더의 위치 (강의면 true, 과제면 false)
     const [viewbutton, setviewbutton] =useState(false); // 폴더 수정 삭제 이동 버튼 노출 여부
     const [Lectviewbutton, setLectviewbutton] =useState(false); // 폴더 수정 삭제 이동 버튼 노출 여부
-    const [newFile, setnewFile] = useState() // 업로드할 파일
+    const [newFile, setnewFile] = useState(); // 업로드할 파일
+    const [selectedItem, setselectedItem] = useState({id:'', is_folder: '', made_by:''}); // 선택된(삭제, 수정, 이동) 폴더 또는 파일 아이디
     // 필요한 유저 정보: is_student, id
     
     // dummy data
     const is_student = false;
-
-    const item_id = "101";
+    const userid = '김재홍';
 
     // 페이지 첫 렌더링 시 동작
     useEffect(() => {
@@ -40,8 +40,8 @@ function ClassPage(props) {
             max_volume: 0,
             pres_volume: 0,
             type: 0,
-            lectureId: '',
-            assignId: ''
+            lectureId: '20000',
+            assignId: '40000'
         });
         setlectItems([
             [101, '1주차', true, '김재홍'],
@@ -186,20 +186,10 @@ function ClassPage(props) {
             .then(handleResponse)
         )
     }
-    const deleteFolder = () => {
-        if (item_id === lectItems) { //(수정 필요)
-            deleteFolderRequest()
-            .then(
-                ()=>{
-                    alert('폴더가 삭제되었습니다.');
-                }
-            )
-        } else {
-            alert('삭제 권한이 없습니다.')
-        }
-    }
     // 폴더 삭제 요청 함수
     const deleteFolderRequest = () => {
+        const url = '/api/folder' + selectedItem.id.toString();
+
         const requestOptions = {
             method: 'DELETE',
             headers: {
@@ -207,7 +197,34 @@ function ClassPage(props) {
                 'Authorization': authHeader().Authorization
             }
         };
-        const url = '/api/forder' //+ folderInfo.f_id (수정 필요)
+
+        return (
+            fetch(url,requestOptions)
+            .then(handleResponse)
+        )
+    }
+    // 파일 삭제 요청 함수
+    const deleteFileRequest = ()=>{
+        let parentId = '';
+
+        // 강의 폴더에서 삭제하는 경우
+        if (Lectviewbutton === true) {
+            parentId = folderInfo.lectureId;
+        } 
+        // 과제 폴더에서 삭제하는 경우
+        else {
+            parentId = folderInfo.assignId;
+        }
+
+        const url = '/api/foler/' + parentId.toString() + '/file/' + selectedItem.id.toString() + '/';
+        
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            }
+        };
 
         return (
             fetch(url,requestOptions)
@@ -215,23 +232,20 @@ function ClassPage(props) {
         )
     }
     // 폴더 정보 수정 요청 함수
-    const EditFolderRequest = (parentType) => {
+    const EditFolderRequest = () => {
+        const url = '/api/folder/' + folderInfo.id.toString();
+
         const requestOptions = {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': authHeader().Authorization
-            },
-            body: JSON.stringify({
-                parent: folderInfo.f_id,
-                name: newFolderName,
-                type: parentType
-            })
+            }
         };
 
         return(
-        fetch(url,requestOptions)
-        .then(handleResponse)
+            fetch(url,requestOptions)
+            .then(handleResponse)
         )
     }
     // 파일 업로드 요청 함수
@@ -264,29 +278,6 @@ function ClassPage(props) {
             .then(handleResponse)
         )
     }
-    const handleResponse = (response) => {
-        if (!response.status === 200) {
-            if (response.status === 401) {
-                // auto logout if 401 response returned from api
-                
-                window.location.reload(true);
-            }
-
-            const error = (data && data.message) || response.statusText;
-            return Promise.reject(error);
-        }
-        return response;
-    }
-
-    // 파일 다운로드 기능
-    /*const FileDownload = () => {
-        FileDownloadRequest()
-        .then(response) => {
-            const blob = new Blob([response.data]);
-        }
-
-    }*/
-
     // 파일 다운로드 요청 함수
     const FileDownloadRequest = () => {
         const requestOptions = {
@@ -304,7 +295,21 @@ function ClassPage(props) {
             .then(handleResponse)
         )
     } 
-    
+    const handleResponse = (response) => {
+        if (!response.status === 200) {
+            if (response.status === 401) {
+                // auto logout if 401 response returned from api
+                
+                window.location.reload(true);
+            }
+
+            const error = (data && data.message) || response.statusText;
+            return Promise.reject(error);
+        }
+        return response;
+    }
+
+
     // 파일 보기 방식 변경 함수
     const onViewHandler = (e)=>{
         if (view==='icon'){
@@ -409,8 +414,113 @@ function ClassPage(props) {
     }
 
 
+    /**
+     * 삭제 기능
+     */
+    // 폴더, 파일 삭제 함수
+    const deleteItem = () => {
+        // 폴더 삭제
+        if (selectedItem.is_folder === true) {
+            if (userid === selectedItem.made_by) { 
+                deleteFolderRequest()
+                .then(
+                    ()=>{
+                        alert('폴더가 삭제되었습니다.');
+                        setPage();
+                    }
+                )
+            } else {
+                alert('삭제 권한이 없습니다.')
+            }
+        }
+        // 파일 삭제
+        else {
+            if (userid === selectedItem.made_by) { 
+                deleteFileRequest()
+                .then(
+                    ()=>{
+                        alert('파일이 삭제되었습니다.');
+                        setPage();
+                    }
+                )
+            } else {
+                alert('삭제 권한이 없습니다.')
+            }
+        }
+    }
+    // 아이템 선택 함수 
+    const clickEvent = (item, type) =>{
+        // 강의에서 선택됨
+        if (type === 1) {
+            // 선택된게 한 번 더 선택 => 선택 취소 
+            if (selectedItem.id === item.id) {
+                setLectviewbutton(false); // 삭제 버튼 안 보이게
+                setselectedItem({id: '', made_by: ''});
+                document.getElementById(item.id).style.backgroundColor = 'white';
+            } 
+            // 신규 선택 => 선택
+            else {
+                // 기존에 선택된 게 있는 경우
+                if (selectedItem.id !== ''){
+                    setLectviewbutton(true); 
+                    setviewbutton(false);
+                    document.getElementById(selectedItem.id).style.backgroundColor = 'white';
+                    setselectedItem({id: item.id, made_by: item.made_by});
+                    document.getElementById(item.id).style.backgroundColor = '#efefef';
+                } 
+                // 기존에 선택된 게 없는 경우 
+                else {
+                    setLectviewbutton(true);
+                    setselectedItem({id: item.id, made_by: item.made_by});
+                    document.getElementById(item.id).style.backgroundColor = '#efefef';
+                }
+            }
+        } 
+        // 과제에서 선택됨
+        else {
+            // 선택된게 한 번 더 선택 => 선택 취소 
+            if (selectedItem.id === item.id) {
+                setviewbutton(false); // 삭제 버튼 안 보이게
+                setselectedItem({id: '', made_by: ''});
+                document.getElementById(item.id).style.backgroundColor = 'white';
+            } 
+            // 신규 선택 => 선택
+            else {
+                // 기존에 선택된 게 있는 경우
+                if (selectedItem.id !== ''){
+                    setviewbutton(true); 
+                    setLectviewbutton(false);
+                    document.getElementById(selectedItem.id).style.backgroundColor = 'white';
+                    setselectedItem({id: item.id, made_by: item.made_by});
+                    document.getElementById(item.id).style.backgroundColor = '#efefef';
+                } 
+                // 기존에 선택된 게 없는 경우 
+                else {
+                    setviewbutton(true);
+                    setselectedItem({id: item.id, made_by: item.made_by});
+                    document.getElementById(item.id).style.backgroundColor = '#efefef';
+                }
+            }
+        }
+    }
+    
+    /**
+     * 파일 다운로드 기능
+     */
+    // 파일 다운로드 함수
+    /*const FileDownload = () => {
+        FileDownloadRequest()
+        .then(response) => {
+            const blob = new Blob([response.data]);
+        }
+
+    }*/
+
+    
+
+
     return (
-        <div className="ClassPage">
+        <div className="ClassPage" >
             <div className="CContainer">
                 {/* 강의실 이름 */}
                 <div className='CCategory'>
@@ -428,14 +538,14 @@ function ClassPage(props) {
                     <div className='SetView'>
                         <div onClick={onViewHandler} className='SetViewElement'>
                             {
-                                view === 'icon'
+                                view === 'list'
                                 ? (<div title="아이콘 보기"><FontAwesomeIcon icon={faTableCellsLarge} /></div>)
                                 : (<div title="리스트 보기"><FontAwesomeIcon icon={faTableList} /></div>)
                             }
                         </div>
                         <div onClick={onSortHandler} className='SetViewElement'>
                             {
-                                sort === 'time'
+                                sort === 'name'
                                 ? (<div title="최신순"><FontAwesomeIcon icon={faArrowDown19} /></div>)
                                 : (<div title="이름순"><FontAwesomeIcon icon={faArrowDownAZ} /></div>)
                             }
@@ -446,23 +556,35 @@ function ClassPage(props) {
                 <div className='CItem'>
                     <div className='ItemTitle'>
                         <div>강의</div>
-                        <div className='PlusContainer'>
-                            {/* 폴더 생성 버튼 */}
-                            <div onClick={newParentIsLect}>
+                        <div className='BContainer'>
+                            <div className='DeleteContainer'>
                                 {
-                                    is_student === false && (
-                                        <div className="CategoryPlusIcon" title='폴더 생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
-                                    )
+                                    Lectviewbutton === true && (
+                                    <div className='EditfolderButton'>
+                                        <div className="DE" onClick={deleteItem}><FontAwesomeIcon icon={faTrashCan} /></div>
+                                        <div style={{color:'#efefef'}}> | </div>
+                                    </div>
+                                    ) 
                                 }
                             </div>
-                            {/* 파일 업로드 버튼 */}
-                            <div onClick={newParentIsLect}>
-                                <form onSubmit={onFileSubmitHandler}>
-                                    <div className="CategoryPlusIcon" title='파일 업로드' onClick={()=>{selectFile.current.click()}}>
-                                        <FontAwesomeIcon icon={faFileCirclePlus} />
-                                        <input type='file' ref={selectFile} onChange={onFileHandler}></input>
-                                    </div>
-                                </form>
+                            <div className='PlusContainer'>
+                                {/* 폴더 생성 버튼 */}
+                                <div onClick={newParentIsLect}>
+                                    {
+                                        is_student === false && (
+                                            <div className="CategoryPlusIcon" title='폴더 생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
+                                        )
+                                    }
+                                </div>
+                                {/* 파일 업로드 버튼 */}
+                                <div onClick={newParentIsLect}>
+                                    <form onSubmit={onFileSubmitHandler}>
+                                        <div className="CategoryPlusIcon" title='파일 업로드' onClick={()=>{selectFile.current.click()}}>
+                                            <FontAwesomeIcon icon={faFileCirclePlus} />
+                                            <input type='file' ref={selectFile} onChange={onFileHandler}></input>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -470,7 +592,7 @@ function ClassPage(props) {
                     {/* 강의 폴더 내 보여주기 */}
                     <div className="Views">
                     {
-                        view === 'icon'
+                        view === 'list'
                         ? (
                         <div className="ListView">
                             <div className="ListColDescription">
@@ -480,7 +602,7 @@ function ClassPage(props) {
                             {
                                 lectItems.map(function(item){
                                     return (
-                                        <div className="ListItem"  key={item[0]} >
+                                        <div className="ListItem"  key={item[0]} id={item[0]}>
                                             <div className="ListIconBox">
                                                 {
                                                     item[2] === true 
@@ -491,8 +613,8 @@ function ClassPage(props) {
                                             <div className='ListNameBox'>
                                                 {
                                                     item[2] === true
-                                                    ? (<p onClick={()=>setLectviewbutton(!Lectviewbutton)} onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
-                                                    : (<p onClick={()=>setLectviewbutton(!Lectviewbutton)} onDoubleClick={()=>FileDownload(item)} >{item[1]}</p>)
+                                                    ? (<p onClick={()=>clickEvent({id: item[0], is_folder: item[2], made_by: item[3]}, 1)} onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
+                                                    : (<p onClick={()=>clickEvent({id: item[0], is_folder: item[2], made_by: item[3]}, 1)} onDoubleClick={()=>FileDownload(item)} >{item[1]}</p>)
                                                 }
                                             </div>
                                             <div className='ListOwner'>
@@ -507,41 +629,27 @@ function ClassPage(props) {
                         <ul className="IconList">
                         {
                             lectItems.map(item => (
-                                <li key={item[0]}> 
-                                    <div className="Iconbox">
-                                            {
-                                                item[2] === true 
-                                                ? (
-                                                <div onClick={()=>setLectviewbutton(!Lectviewbutton)} onDoubleClick={()=>onFolderHandler(item)}>
-                                                    <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
-                                                    <div className="ListNameBox">
-                                                        <p>{item[1]}</p>
-                                                    </div>   
-                                                </div>
-                                                )
-                                                : (
-                                                <div onClick={()=>setLectviewbutton(!Lectviewbutton)} onDoubleClick={()=>FileDownload(item)}>
-                                                    <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
-                                                    <div className="ListNameBox">
-                                                        <p>{item[1]}</p>
-                                                    </div> 
-                                                </div>
-                                                )
-                                            }
-                                    </div>            
+                                <li key={item[0]} id={item[0]} onClick={()=>clickEvent({id: item[0], is_folder: item[2], made_by: item[3]}, 1)} > 
+                                {
+                                    item[2] === true 
+                                    ? (
+                                    <div className="Iconbox" onDoubleClick={()=>onFolderHandler(item)}>
+                                        <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
+                                    </div>
+                                    )
+                                    : (
+                                    <div className="Iconbox" onDoubleClick={()=>FileDownload(item)}>
+                                        <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
+                                    </div>
+                                    )
+                                }
+                                    <div className="IconNameBox">
+                                        <p>{item[1]}</p>
+                                    </div>             
                                 </li>
                             ))
                         } 
                         </ul>)
-                    }
-                    {
-                    Lectviewbutton === true && (
-                        <div className='EditfolderButton'>
-                            <button onClick={deleteFolder}>삭제</button>
-                            <button>수정</button>
-                            <button>이동</button>
-                        </div>
-                    ) 
                     }
                     </div>
                 </div>
@@ -549,30 +657,42 @@ function ClassPage(props) {
                 <div className='CItem'>
                     <div className='ItemTitle'>
                         <div>과제</div>
-                        <div className='PlusContainer'>
-                            {/* 폴더 생성 버튼 */}
-                            <div onClick={newParentIsAssign}>
+                        <div className='BContainer'>
+                            <div className='DeleteContainer'>
                                 {
-                                    is_student === false && (
-                                        <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
-                                    )
+                                    viewbutton === true && (
+                                    <div className='EditfolderButton'>
+                                        <div className="DE" onClick={deleteItem}><FontAwesomeIcon icon={faTrashCan} /></div>
+                                        <div style={{color:'#efefef'}}> | </div>
+                                    </div>
+                                    ) 
                                 }
                             </div>
-                            {/* 파일 업로드 버튼 */}
-                            <div onClick={newParentIsAssign}>
-                                <form onSubmit={onFileSubmitHandler}>
-                                    <div className="CategoryPlusIcon" title='파일 업로드' onClick={()=>{selectFile.current.click()}}>
-                                        <FontAwesomeIcon icon={faFileCirclePlus} />
-                                        <input type='file' ref={selectFile} onChange={onFileHandler}></input>
-                                    </div>
-                                </form>
+                            <div className='PlusContainer'>
+                                {/* 폴더 생성 버튼 */}
+                                <div onClick={newParentIsAssign}>
+                                    {
+                                        is_student === false && (
+                                            <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
+                                        )
+                                    }
+                                </div>
+                                {/* 파일 업로드 버튼 */}
+                                <div onClick={newParentIsAssign}>
+                                    <form onSubmit={onFileSubmitHandler}>
+                                        <div className="CategoryPlusIcon" title='파일 업로드' onClick={()=>{selectFile.current.click()}}>
+                                            <FontAwesomeIcon icon={faFileCirclePlus} />
+                                            <input type='file' ref={selectFile} onChange={onFileHandler}></input>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
                     <div className="Views">
                     {
-                        view === 'icon'
+                        view === 'list'
                         ? (
                         <div className="ListView">
                             <div className="ListColDescription">
@@ -582,7 +702,7 @@ function ClassPage(props) {
                             {
                                 assignItems.map(function(item){
                                     return (
-                                        <div className="ListItem"  key={item[0]} >
+                                        <div className="ListItem"  key={item[0]} id={item[0]}>
                                             <div className="ListIconBox">
                                                 {
                                                     item[2] === true 
@@ -593,8 +713,8 @@ function ClassPage(props) {
                                             <div className='ListNameBox'>
                                                 {
                                                     item[2] === true
-                                                    ? (<p onClick={()=>setviewbutton(!viewbutton)} onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
-                                                    : (<p onClick={()=>setviewbutton(!viewbutton)} onDoubleClick={()=>FileDownload(item)}>{item[1]}</p>)
+                                                    ? (<p onClick={()=>clickEvent({id: item[0], is_folder: item[2], made_by: item[3]}, 2)} onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
+                                                    : (<p onClick={()=>clickEvent({id: item[0], is_folder: item[2], made_by: item[3]}, 2)} onDoubleClick={()=>FileDownload(item)}>{item[1]}</p>)
                                                 }
                                             </div>
                                             <div className='ListOwner'>
@@ -609,41 +729,27 @@ function ClassPage(props) {
                         <ul className="IconList">
                         {
                             assignItems.map(item => (
-                                <li key={item[0]}> 
-                                    <div className="Iconbox">
-                                            {
-                                                item[2] === true 
-                                                ? (
-                                                <div onClick={()=>setviewbutton(!viewbutton)} onDoubleClick={()=>onFolderHandler(item)}>
-                                                    <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
-                                                    <div className="ListNameBox">
-                                                        <p>{item[1]}</p>
-                                                    </div>    
-                                                </div>
-                                                )
-                                                : (
-                                                <div onClick={()=>setviewbutton(!viewbutton)} onDoubleClick={()=>FileDownload(item)}>
-                                                    <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
-                                                    <div className="ListNameBox">
-                                                        <p>{item[1]}</p>
-                                                    </div>  
-                                                </div>
-                                                )
-                                            }
-                                    </div>                 
+                                <li key={item[0]} id={item[0]} onClick={()=>clickEvent({id: item[0], is_folder: item[2], made_by: item[3]}, 2)}> 
+                                {
+                                    item[2] === true 
+                                    ? (
+                                    <div className="Iconbox" onDoubleClick={()=>onFolderHandler(item)}>
+                                        <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
+                                    </div>
+                                    )
+                                    : (
+                                    <div className="Iconbox" >
+                                        <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
+                                    </div>
+                                    )
+                                }
+                                    <div className="IconNameBox">
+                                        <p>{item[1]}</p>
+                                    </div>                
                                 </li>
                             ))
                         } 
                         </ul>)
-                    }
-                    {
-                    viewbutton === true  &&(
-                        <div className='EditfolderButton'>
-                            <button onClick={deleteFolder}>삭제</button>
-                            <button>수정</button>
-                            <button>이동</button>
-                        </div>
-                    ) 
                     }
                     </div>
                 </div>

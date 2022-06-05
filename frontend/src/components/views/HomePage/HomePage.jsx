@@ -7,7 +7,7 @@ import { authHeader } from "../../../_helpers";
 
 function HomePage(props) {
     // 컴포넌트 State
-    const [view, setview] = useState('icon'); // 보기 방식 - icon, list
+    const [view, setview] = useState('list'); // 보기 방식 - icon, list
     const [sort, setsort] = useState('name'); // 정렬 방식 - time, name
     const [isViewModal, setisViewModal] = useState(false); // 강의실 추가 모달창 노출 여부
     const [classCode, setclasscode] = useState(''); // 강의실 추가 코드
@@ -15,7 +15,16 @@ function HomePage(props) {
     // 필요한 유저 정보: is_student (localStorage에서 가져오기)
 
     // dummy data
-    const itemList = [['folder1','캡스톤디자인', true, '이원희'], ['folder2','클라우드컴퓨팅',true, '김재홍']]
+    const itemList = [['folder1','캡스톤디자인', true, '이원희'], 
+    ['folder2','클라우드컴퓨팅',true, '김재홍'], 
+    ['folder3','클라우드컴퓨팅',true, '김재홍'], 
+    ['folder4','클라우드컴퓨팅',true, '김재홍'], 
+    ['folder5','클라우드컴퓨팅',true, '김재홍'], 
+    ['folder6','클라우드컴퓨팅',false, '김재홍'], 
+    ['folder7','클라우드컴퓨팅',true, '김재홍'],
+
+    ]
+
     // const u_id = localStorage.getItem('user');
     const is_student = false;
 
@@ -190,14 +199,14 @@ function HomePage(props) {
                 <div className='SetView'>
                     <div onClick={onViewHandler} className='SetViewElement'>
                         {
-                            view === 'icon'
+                            view === 'list'
                             ? (<div title="아이콘 보기"><FontAwesomeIcon icon={faTableCellsLarge} /></div>)
                             : (<div title="리스트 보기"><FontAwesomeIcon icon={faTableList} /></div>)
                         }
                     </div>
                     <div onClick={onSortHandler} className='SetViewElement'>
                         {
-                            sort === 'time'
+                            sort === 'name'
                             ? (<div title="최신순"><FontAwesomeIcon icon={faArrowDown19} /></div>)
                             : (<div title="이름순"><FontAwesomeIcon icon={faArrowDownAZ} /></div>)
                         }
@@ -214,50 +223,54 @@ function HomePage(props) {
             </div>
             <div className="Views">
                 {
-                    view === 'icon'
-                    ? (<div className="ListView">
-                    <div className="ListColDescription">
-                        <div className='ListColLeft'>강의실 이름</div>
-                        <div>강의자</div>
-                    </div>
+                    view === 'list'
+                    ? (
+                    <div className="ListView">
+                        <div className="ListColDescription">
+                            <div className='ListColLeft'>강의실 이름</div>
+                            <div>강의자</div>
+                        </div>
+                        {
+                            itemList.map(function(item){
+                                return (
+                                    <div className="ListItem" onDoubleClick={()=>openFolder(item)} key={item[0]} >
+                                        <div className="ListIconBox">
+                                        {
+                                            item[2] === true 
+                                            ? (<FontAwesomeIcon icon={faFolder} className="ListFolderIcon"/>)
+                                            : (<FontAwesomeIcon icon={faFileLines} className="ListFileIcon"/>)
+                                        }
+                                        </div>
+                                        <div className="ListNameBox">
+                                            <p>{item[1]}</p>
+                                        </div>
+                                        <div className='ListOwner'>
+                                            <p>{item[3]}</p>
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>)
+                    : (
+                    <ul className="IconList">
                     {
-                        itemList.map(function(item){
-                            return (
-                                <div className="ListItem" onDoubleClick={()=>openFolder(item)} key={item[0]} >
-                                    <div className="ListIconBox">
-                                    {
-                                        item[2] === true 
-                                        ? (<FontAwesomeIcon icon={faFolder} className="ListFolderIcon"/>)
-                                        : (<FontAwesomeIcon icon={faFileLines} className="ListFileIcon"/>)
-                                    }
-                                    </div>
-                                    <div className="ListNameBox">
-                                        <p>{item[1]}</p>
-                                    </div>
-                                    <div className='ListOwner'>
-                                        <p>{item[3]}</p>
-                                    </div>
-                                </div>
-                            )
-                        })
-                    }
-                </div>)
-                    : (<ul className="IconList">
-                    {itemList.map(item => (
+                    itemList.map(item => (
                         <li onDoubleClick={()=>openFolder(item)} key={item[0]}> 
                             <div className="Iconbox">
-                                    {
-                                        item[2] === true 
-                                        ? (<FontAwesomeIcon icon={faFolder} className="FolderIcon"/>)
-                                        : (<FontAwesomeIcon icon={faFileLines} className="FileIcon"/>)
-                                    }
+                                {
+                                    item[2] === true 
+                                    ? (<FontAwesomeIcon icon={faFolder} className="FolderIcon"/>)
+                                    : (<FontAwesomeIcon icon={faFileLines} className="FileIcon"/>)
+                                }
                             </div>
-                            <div className="ListNameBox">
+                            <div className="IconNameBox">
                                 <p>{item[1]}</p>
                             </div>                     
-                        </li>
-                    ))} 
-                </ul>)
+                        </li>))
+                    } 
+                    </ul>
+                    )
                 }
             </div>
             {/* 강의실 추가 모달 */}

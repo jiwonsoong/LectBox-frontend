@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react"
+import { authHeader } from "../../../_helpers";
 import './UserInfoPage.css';
-function UserInfoPage(){
+
+function UserInfoPage(props){
 	const [UserInfo, setuserInfo] = useState({u_id: "", u_email: "", u_name: "",u_password: 
     "",change_password: ""});
 

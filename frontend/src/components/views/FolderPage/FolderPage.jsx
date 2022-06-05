@@ -2,12 +2,12 @@ import React, { useEffect, useState, useRef } from "react";
 import './FolderPage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
-import { faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus } from '@fortawesome/free-solid-svg-icons'
+import { faTrashCan, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus } from '@fortawesome/free-solid-svg-icons'
 import { authHeader } from '../../../_helpers';
 
 function FolderPage (props) {
     const { params } = props.match;
-    const [view, setview] = useState('icon'); // icon, list
+    const [view, setview] = useState('list'); // icon, list
     const [sort, setsort] = useState('name'); // time, name
     const [isViewAddModal, setisViewAddModal] = useState(false); // 폴더 생성 모달 노출 여부
     const [newFolderName, setnewFolderName] = useState('') // 생성할 폴더 이름
@@ -23,9 +23,13 @@ function FolderPage (props) {
     }); // 현재 폴더 정보
     const [folderItems, setfolderItems] = useState([]) // 폴더 안 하위 내용 
     const [folderPath, setfolderPath] = useState([]) // 폴더 경로
+    const [viewbutton, setviewbutton] =useState(false); // 폴더 수정 삭제 이동 버튼 노출 여부
+    const [selectedItem, setselectedItem] = useState({id:'', is_folder: '', made_by:''}); // 선택된(삭제, 수정, 이동) 폴더 또는 파일 아이디
+    
 
     // dummy data
     const is_student = false;
+    const userid = '김재홍';
 
     // 필요한 데이터:
     // 유저 아이디, 유저 권한, 부모 폴더 아이디
@@ -165,6 +169,40 @@ function FolderPage (props) {
             .then(handleResponse)
         )
     }
+    // 폴더 삭제 요청 함수
+    const deleteFolderRequest = () => {
+        const url = '/api/folder' + selectedItem.id.toString();
+
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            }
+        };
+
+        return (
+            fetch(url,requestOptions)
+            .then(handleResponse)
+        )
+    }
+    // 파일 삭제 요청 함수
+    const deleteFileRequest = ()=>{
+        const url = '/api/foler/' + folderInfo.id.toString() + '/file/' + selectedItem.id.toString() + '/';
+        
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            }
+        };
+
+        return (
+            fetch(url,requestOptions)
+            .then(handleResponse)
+        )
+    }
     const handleResponse = (response) => {
         if (!response.status === 200) {
             if (response.status === 401) {
@@ -271,6 +309,68 @@ function FolderPage (props) {
         props.history.push(url);
     }
 
+    /**
+     * 삭제 기능
+     */
+    // 폴더, 파일 삭제 함수
+    const deleteItem = () => {
+        // 폴더 삭제
+        if (selectedItem.is_folder === true) {
+            if (userid === selectedItem.made_by) { 
+                deleteFolderRequest()
+                .then(
+                    ()=>{
+                        alert('폴더가 삭제되었습니다.');
+                        setFolder();
+                    }
+                )
+            } else {
+                alert('삭제 권한이 없습니다.')
+            }
+        }
+        // 파일 삭제
+        else {
+            if (userid === selectedItem.made_by) { 
+                deleteFileRequest()
+                .then(
+                    ()=>{
+                        alert('파일이 삭제되었습니다.');
+                        setFolder();
+                    }
+                )
+            } else {
+                alert('삭제 권한이 없습니다.')
+            }
+        }
+    }
+    // 아이템 선택 함수 
+    const clickEvent = (item) =>{
+        // 선택된게 한 번 더 선택 => 선택 취소 
+        if (selectedItem.id === item.id) {
+            setviewbutton(false); // 삭제 버튼 안 보이게
+            setselectedItem({id: '', made_by: ''});
+            document.getElementById(item.id).style.backgroundColor = 'white';
+        } 
+        // 신규 선택 => 선택
+        else {
+            // 기존에 선택된 게 있는 경우
+            if (selectedItem.id !== ''){
+                setviewbutton(true); 
+                document.getElementById(selectedItem.id).style.backgroundColor = 'white';
+                setselectedItem({id: item.id, made_by: item.made_by});
+                document.getElementById(item.id).style.backgroundColor = '#efefef';
+            } 
+            // 기존에 선택된 게 없는 경우 
+            else {
+                setviewbutton(true);
+                setselectedItem({id: item.id, made_by: item.made_by});
+                document.getElementById(item.id).style.backgroundColor = '#efefef';
+            }
+        }
+    }
+
+
+
     return (
         <div className="ClassPage">
             <div className="CContainer">
@@ -295,41 +395,52 @@ function FolderPage (props) {
                     <div className='SetView'>
                         <div onClick={onViewHandler} className='SetViewElement'>
                             {
-                                view === 'icon'
+                                view === 'list'
                                 ? (<div title="아이콘 보기"><FontAwesomeIcon icon={faTableCellsLarge} /></div>)
                                 : (<div title="리스트 보기"><FontAwesomeIcon icon={faTableList} /></div>)
                             }
                         </div>
                         <div onClick={onSortHandler} className='SetViewElement'>
                             {
-                                sort === 'time'
+                                sort === 'name'
                                 ? (<div title="최신순"><FontAwesomeIcon icon={faArrowDown19} /></div>)
                                 : (<div title="이름순"><FontAwesomeIcon icon={faArrowDownAZ} /></div>)
                             }
                         </div>
                     </div>
                 </div>
-                <div className="FButtonBox">
-                    <div className='PlusContainer'>
-                        {/* 폴더 생성 버튼 */}
-                        {
-                            is_student === false && (
-                                <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
-                            )
-                        }
-                        {/* 파일 업로드 버튼 */}
-                        <form onSubmit={onFileSubmitHandler}>
-                            <div className="CategoryPlusIcon" title='파일 업로드' onClick={()=>{selectFile.current.click()}}>
-                                <FontAwesomeIcon icon={faFileCirclePlus} />
-                                <input type='file' ref={selectFile} onChange={onFileHandler}></input>
-                            </div>
-                        </form>
+                <div className="FBContainer">
+                    <div className="FButtonBox">
+                        <div className='DeleteContainer'>
+                            {
+                                viewbutton === true && (
+                                <div className='EditfolderButton'>
+                                    <div className="DE" onClick={deleteItem}><FontAwesomeIcon icon={faTrashCan} /></div>
+                                    <div style={{color:'#efefef'}}> | </div>
+                                </div>
+                                ) 
+                            }
+                        </div>
+                        <div className='PlusContainer'>
+                            {/* 폴더 생성 버튼 */}
+                            {
+                                is_student === false && (
+                                    <div className="CategoryPlusIcon" title='생성' onClick={viewAddFolderModal}><FontAwesomeIcon icon={faFolderPlus} /></div>
+                                )
+                            }
+                            {/* 파일 업로드 버튼 */}
+                            <form onSubmit={onFileSubmitHandler}>
+                                <div className="CategoryPlusIcon" title='파일 업로드' onClick={()=>{selectFile.current.click()}}>
+                                    <FontAwesomeIcon icon={faFileCirclePlus} />
+                                    <input type='file' ref={selectFile} onChange={onFileHandler}></input>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    
                 </div>
                 <div className="Views">
                     {
-                        view === 'icon'
+                        view === 'list'
                         ? (
                         <div className="ListView">
                             <div className="ListColDescription">
@@ -339,7 +450,7 @@ function FolderPage (props) {
                             {
                                 folderItems.map(function(item){
                                     return (
-                                        <div className="ListItem"  key={item[0]} >
+                                        <div className="ListItem"  key={item[0]} id={item[0]}>
                                             <div className="ListIconBox">
                                                 {
                                                     item[2] === true 
@@ -350,8 +461,8 @@ function FolderPage (props) {
                                             <div className='ListNameBox'>
                                                 {
                                                     item[2] === true
-                                                    ? (<p onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
-                                                    : (<p>{item[1]}</p>)
+                                                    ? (<p onClick={()=>clickEvent({id: item[0], is_folder: item[2], made_by: item[3]})} onDoubleClick={()=>onFolderHandler(item)}>{item[1]}</p>)
+                                                    : (<p onClick={()=>clickEvent({id: item[0], is_folder: item[2], made_by: item[3]})}>{item[1]}</p>)
                                                 }
                                             </div>
                                             <div className='ListOwner'>
@@ -366,27 +477,22 @@ function FolderPage (props) {
                         <ul className="IconList">
                         {
                             folderItems.map(item => (
-                                <li key={item[0]}> 
+                                <li key={item[0]} id={item[0]} onClick={()=>clickEvent({id: item[0], is_folder: item[2], made_by: item[3]})}> 
+                                {
+                                    item[2] === true 
+                                    ? (
+                                    <div className="Iconbox" onDoubleClick={()=>onFolderHandler(item)}>
+                                        <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
+                                    </div>
+                                    )
+                                    : (
                                     <div className="Iconbox">
-                                            {
-                                                item[2] === true 
-                                                ? (
-                                                <div onDoubleClick={()=>onFolderHandler(item)}>
-                                                    <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
-                                                    <div className="ListNameBox">
-                                                        <p>{item[1]}</p>
-                                                    </div>   
-                                                </div>
-                                                )
-                                                : (
-                                                <div>
-                                                    <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
-                                                    <div className="ListNameBox">
-                                                        <p>{item[1]}</p>
-                                                    </div> 
-                                                </div>
-                                                )
-                                            }
+                                        <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
+                                    </div>
+                                    )
+                                }
+                                    <div className="IconNameBox">
+                                        <p>{item[1]}</p>
                                     </div>            
                                 </li>
                             ))
