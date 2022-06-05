@@ -1,19 +1,47 @@
+html,body, #root, #root > div{
+    height: 100%;
+}
 .register-group {
     display: flex;
+    align-items: center;
     float: left;
-    margin-top: 25px;
+    margin-top: 14px;
+    font-size: 14px;
 }
 
 .info-group{
     display: flex;
-    margin-right: 5px;
-    height: 30px;
-    width: 150px;
+    margin-right: 15px;
+    height: 14px;
+    width: 160px;
 }
 
-.info-group2{
+.RegisterPage {
     display: flex;
-    margin-right: 5px;
+    justify-content: center;
+    align-items: center;
+    width: 100%; 
+    height: calc(100% - 55px);
+}
+
+.RegisterPage .form-group {
+    display: flex;
+}
+
+a {
+    color: black !important;
+}
+
+.ig2-container {
+    display: flex;
+    width: 160px;
+    justify-content: space-between;
     height: 30px;
-    width: 120px;
+}
+.ig2-c-c {
+    display: flex;
+    align-items: center;
+}
+.info-group2 {
+    margin: 0 10px 0 0;
 }
