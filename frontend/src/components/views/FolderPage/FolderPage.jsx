@@ -17,8 +17,8 @@ function FolderPage (props) {
         id: 44444,
         made_by: 'user2',
         name: '1주차',
-        max_volume: 0,
-        pres_volume: 0,
+        max_volume: 20,
+        pres_volume: 2,
         type: 0
     }); // 현재 폴더 정보
     const [folderItems, setfolderItems] = useState([]) // 폴더 안 하위 내용 
@@ -41,8 +41,8 @@ function FolderPage (props) {
             id: 44444,
             made_by: 'user2',
             name: '1주차',
-            max_volume: 0,
-            pres_volume: 0,
+            max_volume: 20,
+            pres_volume: 2,
             type: 0
         });
         const pathList = '클라우드 컴퓨팅>1주차'.split('>');
@@ -56,7 +56,7 @@ function FolderPage (props) {
             [116, 'test', true, '김재홍'],
         ])
 
-
+        colorBar();
         /**
          * 백엔드랑 연동 시
          */
@@ -89,6 +89,12 @@ function FolderPage (props) {
             }
         )
     }
+    // 용량 표시 위한 css 조작 함수
+    const colorBar = ()=>{
+        const fill = folderInfo.pres_volume / folderInfo.max_volume * 100;
+        document.getElementById('barfill').style.width = fill.toString() + '%';
+    }
+
 
     /**
      * 요청
@@ -389,6 +395,15 @@ function FolderPage (props) {
                                 }
                             })
                         }
+                    </div>
+                </div>
+                <div className='storage-box'>
+                    <div>저장용량</div>
+                    <div className='storage-content'>
+                        <div className='bar'>
+                            <div className='barfill' id='barfill'></div>
+                        </div>
+                        <div>{folderInfo.pres_volume}{' / '}{folderInfo.max_volume}{'GB'}</div>
                     </div>
                 </div>
                 <div className="SetViewContainer">

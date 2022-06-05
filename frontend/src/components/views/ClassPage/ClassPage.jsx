@@ -15,7 +15,17 @@ function ClassPage(props) {
     const { params } = props.match
     const [lectItems, setlectItems] = useState([]); // 강의 폴더의 하위 내용
     const [assignItems, setassignItems] = useState([]); // 과제 폴더의 하위 내용
-    const [folderInfo, setfolderInfo] = useState({}); // 현재 폴더 정보
+    const [folderInfo, setfolderInfo] = useState({
+        parent: 0,
+        id: 12345,
+        made_by: 'user2',
+        name: '클라우드 컴퓨팅',
+        max_volume: 50,
+        pres_volume: 30,
+        type: 0,
+        lectureId: '20000',
+        assignId: '40000'
+    }); // 현재 폴더 정보
     const [isViewAddModal, setisViewAddModal] = useState(false); // 폴더 생성 모달 노출 여부
     const [newFolderName, setnewFolderName] = useState('') // 생성할 폴더 이름
     const [isLect, setisLect] = useState() // 생성할 폴더의 위치 (강의면 true, 과제면 false)
@@ -32,17 +42,18 @@ function ClassPage(props) {
     // 페이지 첫 렌더링 시 동작
     useEffect(() => {
         // dummy data 
-        setfolderInfo({
-            parent: 0,
-            id: 12345,
-            made_by: 'user2',
-            name: '클라우드 컴퓨팅',
-            max_volume: 0,
-            pres_volume: 0,
-            type: 0,
-            lectureId: '20000',
-            assignId: '40000'
-        });
+        // setfolderInfo({
+        //     parent: 0,
+        //     id: 12345,
+        //     made_by: 'user2',
+        //     name: '클라우드 컴퓨팅',
+        //     max_volume: 50,
+        //     pres_volume: 30,
+        //     type: 0,
+        //     lectureId: '20000',
+        //     assignId: '40000'
+        // })
+
         setlectItems([
             [101, '1주차', true, '김재홍'],
             [102, '2주차', true, '김재홍'],
@@ -54,11 +65,12 @@ function ClassPage(props) {
             [401, '숙제1_홍길동', false, '홍길동']
         ]);
 
+        
         /** 
          * 백엔드랑 연동 시
          */ 
         // setPage();
-        
+        colorBar()
     }, [])
 
     // 강의실 정보, 강의 폴더 정보, 과제 폴더 정보 reset 함수
@@ -99,6 +111,12 @@ function ClassPage(props) {
                 )
             }
         )
+    }
+
+    // 용량 표시 위한 css 조작 함수
+    const colorBar = ()=>{
+        const fill = folderInfo.pres_volume / folderInfo.max_volume * 100;
+        document.getElementById('barfill').style.width = fill.toString() + '%';
     }
 
     /**
@@ -533,6 +551,15 @@ function ClassPage(props) {
                             </div>
                         )
                     }
+                </div>
+                <div className='storage-box'>
+                    <div>저장용량</div>
+                    <div className='storage-content'>
+                        <div className='bar'>
+                            <div className='barfill' id='barfill'></div>
+                        </div>
+                        <div>{folderInfo.pres_volume}{' / '}{folderInfo.max_volume}{'GB'}</div>
+                    </div>
                 </div>
                 <div className="SetViewContainer">
                     <div className='SetView'>

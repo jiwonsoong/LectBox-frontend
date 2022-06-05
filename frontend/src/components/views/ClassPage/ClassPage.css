@@ -10,6 +10,7 @@
     font-size: 18px;
 }
 
+
 .CCategory {
     padding: 0 15px 0 15px;
     margin-bottom: 10px;
@@ -83,4 +84,30 @@
 .DE:hover{
     color: black;
     cursor: pointer;
+}
+
+.bar {
+    width: 100px;
+    height: 7px;
+    background-color: #dedede;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+
+.barfill {
+    height: inherit;
+    /* background-color: #00a4fc; */
+    background-color: hsl(9, 100%, 77%);
+    border-radius: 5px;
+}
+
+.storage-box {
+    font-size: 13px;
+    margin: 20px 0 0 0;
+    padding: 0 0 0 18px;
+}
+.storage-content {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
 }

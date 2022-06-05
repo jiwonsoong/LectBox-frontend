@@ -1,6 +1,10 @@
 .FCategory {
     display: flex;
     flex-direction: column;
+    padding: 0 15px 0 15px;
+}
+.FCategory .Category {
+    font-size: 22px;
 }
 
 .FPath {
