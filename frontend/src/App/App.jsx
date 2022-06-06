@@ -52,9 +52,9 @@ function App() {
                     <Route path="/login" component={LoginPage} />
                     <Route path="/register" component={RegisterPage} />
                     <PrivateRoute path='/user' component={HomePage} />
-                    <PrivateRoute exact path='/class/:classid' component={ClassPage}/>
-                    <PrivateRoute exact path='/folder/:folderid' component={FolderPage}/>
-                    <PrivateRoute exact path='/class/:classid/manage' component={ManageClassPage}/>
+                    <PrivateRoute exact path='/class' component={ClassPage}/>
+                    <PrivateRoute exact path='/folder' component={FolderPage}/>
+                    <PrivateRoute exact path='/class/manage' component={ManageClassPage}/>
                     <PrivateRoute path='/userinfo' component={UserInfoPage}/>
                     <Redirect from="*" to="/" />
                 </Switch>

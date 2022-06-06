@@ -5,9 +5,10 @@ import { faFileLines } from '@fortawesome/free-regular-svg-icons';
 import { faTrashCan, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus } from '@fortawesome/free-solid-svg-icons'
 import { authHeader } from '../../../_helpers';
 import { useParams } from 'react-router-dom';
+import { createBrowserHistory } from "history";
 
 function FolderPage (props) {
-    let { folderid } = useParams();
+    // let { folderid } = useParams();
     const [view, setview] = useState('list'); // icon, list
     const [sort, setsort] = useState('name'); // time, name
     const [isViewAddModal, setisViewAddModal] = useState(false); // 폴더 생성 모달 노출 여부
@@ -20,6 +21,8 @@ function FolderPage (props) {
     const [selectedItem, setselectedItem] = useState({id:'', is_folder: '', made_by:''}); // 선택된(삭제, 수정, 이동) 폴더 또는 파일 아이디
     const [user, setuser] = useState({});
     const baseurl = 'http://localhost:8000';
+    let path = JSON.parse(localStorage.getItem('path'));
+    const history = createBrowserHistory();
 
     // 필요한 데이터:
     // 부모 폴더 아이디
@@ -29,6 +32,8 @@ function FolderPage (props) {
         const user = JSON.parse(localStorage.getItem('user'));
 
         if (user){
+            path = JSON.parse(localStorage.getItem('path'));
+
             setuser({
                 id: user.id,
                 is_student: user.is_student
@@ -52,7 +57,25 @@ function FolderPage (props) {
 
         colorBar();
 
-    }, [folderInfo])
+    }, [folderInfo]);
+
+    useEffect(() => {
+        const listenBackEvent = () => {
+          // 뒤로가기 할 때 수행할 동작을 적는다
+          
+        };
+    
+        const unlistenHistoryEvent = history.listen(({ action }) => {
+          if (action === "POP") {
+            console.log('뒤로가기')
+            listenBackEvent();
+          }
+        });
+    
+        return unlistenHistoryEvent;
+      }, [
+      // effect에서 사용하는 state를 추가
+    ]);
 
     // 빈 객체 확인 함수
     const isEmptyObj = (obj) => {
@@ -98,7 +121,7 @@ function FolderPage (props) {
     // 폴더 정보 요청 함수
     const folderRequest = () => {
         
-        const url = baseurl + '/api/folder/' + folderid + '/1';
+        const url = baseurl + '/api/folder/' + path.pro + '/1';
 
         const requestOptions = {
             method: 'GET',
@@ -115,7 +138,7 @@ function FolderPage (props) {
     }
     // 폴더 경로 요청 함수
     const folderPathRequest = () => {
-        const url = baseurl + '/api/folder_path/' + folderid;
+        const url = baseurl + '/api/folder_path/' + path.pro;
 
         const requestOptions = {
             method: 'GET',
@@ -210,11 +233,11 @@ function FolderPage (props) {
         return response.text().then(json => {
             const data = json && JSON.parse(json);
             if (!response.status === 200) {
-                if (response.status === 401) {
-                    // auto logout if 401 response returned from api
-                    logout();
-                    window.location.reload(true);
-                }
+                // if (response.status === 401) {
+                //     // auto logout if 401 response returned from api
+                //     logout();
+                //     window.location.reload(true);
+                // }
     
                 const error = (data && data.message) || response.statusText;
                 return Promise.reject(error);
@@ -312,9 +335,8 @@ function FolderPage (props) {
      */
     // 폴더 열기 함수
     const onFolderHandler = (folderId) => {
-        const url = '/folder/' + folderId.toString();
-        props.history.push(url);
-        setFolder();
+        localStorage.setItem('path', JSON.stringify({pre: path.pro, pro: folderId, post: ''}));
+        window.location.reload();
     }
 
     /**
