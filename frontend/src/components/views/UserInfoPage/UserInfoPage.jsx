@@ -4,15 +4,36 @@ import { authHeader } from "../../../_helpers";
 import './UserInfoPage.css';
 
 function UserInfoPage(props){
-	const [UserInfo, setuserInfo] = useState({u_id: "", u_email: "", u_name: "",u_password: 
+	const [UserInfo, setUserInfo] = useState({u_id: "", u_email: "", u_name: "",u_password: 
     "",change_password: "", u_school: "", u_subject: "", is_student: true});
     const [viewinput,setviewinput] =useState(false);
     const [Name, setName] = useState("")
     const [Email, setEmail] = useState("")
     const [School, setSchool] = useState("")
     const [Department, setDepartment] = useState("")
+    const baseurl = 'http://localhost:8000';
     
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
 
+        if (user){
+            // 유저 정보 요청
+            UserRequest()
+            .then((data) => {
+                console.log(data);
+
+                setUserInfo({
+                u_id: data.id,
+                u_name: data.name,
+                u_email: data.email,
+                u_password: data.password, 
+                is_student: data.is_student    
+                })
+            });
+        } else {
+            return ;
+        }
+    }, []);
     
     const onNameHandler = (event) => {
         setName(event.currentTarget.value)
@@ -45,7 +66,7 @@ function UserInfoPage(props){
             .then( ()=> {
                 alert('변경되었습니다.')
             })
-        }else {
+        } else {
             alert('변경 권한이 없습니다')
         }
     }
@@ -84,35 +105,14 @@ function UserInfoPage(props){
 
     const user_pass = '1234'
 
-    useEffect(() => {
-        // 폴더 정보 요청
-        setuserInfo({
-            u_id: 'sjw0592',
-            u_email: "sjw0592@khu.ac.kr",
-            u_name: "손지원",
-            u_password: "1234",
-            u_school: "경희대학교",
-            u_subject: "컴퓨터공학과",
-            change_password: "",
-        })
-
-         // UserRequest().then((data) =>
-        //     setuserInfo({
-        //     u_id: data.id,
-        //     u_name: data.name,
-        //     u_email: data.e-mail,
-        //     u_password: data.password, 
-        //     is_student: data.is_student    
-        //     })
-        // );
-    }, []);
+    
 
     function onChangetext (e){
         setuserInfo.u_password(e.target.value);
     }
 
     const UserRequest = () => {
-        const url = "api/member-detail/";
+        const url = baseurl + "/api/member-detail/";
         const requestOptions = {
         method: "GET",
         headers: {
@@ -128,12 +128,13 @@ function UserInfoPage(props){
     };
 
     const EditUserRequest = (body) => {
-        const url = "api/member-detail/";
+        const url = baseurl + "/api/member-detail/";
         const requestOptions = {
             method: "PUT",
             headers: {
-
-            },
+                "Content-Type": "application/json",
+                Authorization: authHeader().Authorization,
+                },
             body: JSON.stringify(body)
         };
 
@@ -165,7 +166,7 @@ function UserInfoPage(props){
             }
         };
 
-        const url = '/api/member-detail/'
+        const url = baseurl + '/api/member-detail/'
 
         return (
             fetch(url, requestOptions)
@@ -174,18 +175,21 @@ function UserInfoPage(props){
     }
 
     const handleResponse = (response) => {
-        if (!response.status === 200 && !response.status === 204) {
-        if (
-            response.status === 400 ||
-            response.status === 401 ||
-            response.status === 404
-        ) {
-            window.location.reload(true);
-        }
-        const error = (data && data.message) || response.statusText;
-        return Promise.reject(error);
-        }
-        return response;
+        return response.text().then(json => {
+            const data = json && JSON.parse(json);
+            if (!response.status === 200) {
+                if (response.status === 401) {
+                    // auto logout if 401 response returned from api
+                    logout();
+                    window.location.reload(true);
+                }
+    
+                const error = (data && data.message) || response.statusText;
+                return Promise.reject(error);
+            }
+            
+            return data;
+        });
     };
 
 

@@ -5,26 +5,30 @@ import { authHeader } from "../../../_helpers";
 function ManageClassPage(props) {
 	const { params } = props.match;
 	const [folderInfo, setfolderInfo] = useState({f_id: params.classid, f_name: "unknown", manager: "unknown"});
-    // 필요한 정보: 유저 정보 ( 유저 아이디 )
-    // dummy
-    const user_id = 'kjh'
+    const [user, setuser] = useState({});
+    const baseurl = 'http://localhost:8000';
 
     // 페이지 첫 렌더링 시 동작
     useEffect(() => {
-        // 폴더 정보 요청
-        setfolderInfo({
-            f_id: 'cc',
-            f_name: "클라우드컴퓨팅",
-            manager: "kjh"
-        })
+        const user = JSON.parse(localStorage.getItem('user'));
 
-        // folderRequest().then((data) =>
-        //     setfolderInfo({
-        //     f_id: data.id,
-        //     f_name: data.name,
-        //    manager: data.made_by
-        //     })
-        // );
+        if (user){
+            setuser({
+                id: user.id
+            })
+            // 폴더 정보 요청
+            folderRequest()
+            .then((data) =>
+                setfolderInfo({
+                    f_id: data.id,
+                    f_name: data.name,
+                    manager: data.made_by
+                })
+            );
+        } else {
+            return ;
+        }
+        
     }, []);
 
     /**
@@ -32,7 +36,7 @@ function ManageClassPage(props) {
      */
     // 폴더 정보 요청 함수
     const folderRequest = () => {
-        const url = "api/folder/" + params.classid + "/0";
+        const url = baseurl + "/api/folder/" + params.classid + "/0";
         const requestOptions = {
         method: "GET",
         headers: {
@@ -57,7 +61,7 @@ function ManageClassPage(props) {
             }
         };
 
-        const url = '/api/forder' + folderInfo.f_id
+        const url = baseurl + '/api/folder/' + folderInfo.f_id.toString();
 
         return (
             fetch(url, requestOptions)
@@ -66,18 +70,23 @@ function ManageClassPage(props) {
     }
 
     const handleResponse = (response) => {
-        if (!response.status === 200) {
-        if (
-            response.status === 400 ||
-            response.status === 401 ||
-            response.status === 404
-        ) {
-            window.location.reload(true);
-        }
-        const error = (data && data.message) || response.statusText;
-        return Promise.reject(error);
-        }
-        return response;
+        return response.text().then(json => {
+            const data = json && JSON.parse(json);
+            if (!response.status === 200) {
+                if (response.status === 400 ||
+                    response.status === 401 ||
+                    response.status === 404) {
+
+                    window.location.reload(true);
+                }
+    
+                const error = (data && data.message) || response.statusText;
+                return Promise.reject(error);
+            }
+            
+
+            return data;
+        });
     };
 
 
@@ -85,7 +94,7 @@ function ManageClassPage(props) {
      * 강의실 삭제 기능
      */
     const deleteClass = () => {
-        if (user_id === folderInfo.manager) {
+        if (user.id === folderInfo.manager) {
             deleteRequest()
             .then(
                 ()=>{

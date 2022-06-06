@@ -18,7 +18,7 @@ function login(id, pw) {
         body: JSON.stringify({ id, pw })
     };
 
-    return fetch(`${config.apiUrl}/users/authenticate`, requestOptions)
+    return fetch(`http://localhost:8000/api/login/`, requestOptions)
         .then(handleResponse)
         .then(user => {
             // store user details and jwt token in local storage to keep user logged in between page refreshes
@@ -58,7 +58,7 @@ function register(user) {
         body: JSON.stringify(user)
     };
 
-    return fetch(`${config.apiUrl}/users/register`, requestOptions).then(handleResponse);
+    return fetch(`http://localhost:8000/users/register`, requestOptions).then(handleResponse);
 }
 
 function update(user) {
