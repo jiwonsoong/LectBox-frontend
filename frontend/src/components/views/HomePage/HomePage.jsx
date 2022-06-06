@@ -11,27 +11,34 @@ function HomePage(props) {
     const [sort, setsort] = useState('name'); // 정렬 방식 - time, name
     const [isViewModal, setisViewModal] = useState(false); // 강의실 추가 모달창 노출 여부
     const [classCode, setclasscode] = useState(''); // 강의실 추가 코드
-    //const [itemList, setitemList] = useState([]); // 강의실 목록 
-    // 필요한 유저 정보: is_student (localStorage에서 가져오기)
+    const [itemList, setitemList] = useState([]); // 강의실 목록 
+    const [user, setuser] = useState({}); // 유저 정보 
+    const baseurl = 'http://localhost:8000'
 
     // dummy data
-    const itemList = [['folder1','캡스톤디자인', true, '이원희'], 
-    ['folder2','클라우드컴퓨팅',true, '김재홍'], 
-    ['folder3','클라우드컴퓨팅',true, '김재홍'], 
-    ['folder4','클라우드컴퓨팅',true, '김재홍'], 
-    ['folder5','클라우드컴퓨팅',true, '김재홍'], 
-    ['folder6','클라우드컴퓨팅',false, '김재홍'], 
-    ['folder7','클라우드컴퓨팅',true, '김재홍'],
-
-    ]
-
-    // const u_id = localStorage.getItem('user');
-    const is_student = false;
+    // const itemList = [['folder1','캡스톤디자인', true, '이원희'], 
+    //     ['folder2','클라우드컴퓨팅',true, '김재홍'], 
+    //     ['folder3','클라우드컴퓨팅',true, '김재홍'], 
+    //     ['folder4','클라우드컴퓨팅',true, '김재홍'], 
+    //     ['folder5','클라우드컴퓨팅',true, '김재홍'], 
+    //     ['folder6','클라우드컴퓨팅',false, '김재홍'], 
+    //     ['folder7','클라우드컴퓨팅',true, '김재홍'],
+    // ]
 
     // 페이지 첫 렌더링 시 동작
     useEffect(() => {
         // 폴더 정보 요청하여 강의실 리스트 생성
-        // setPage();
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (user){
+            setuser({
+                is_student: user.is_student
+            })
+            setPage();
+        } else {
+            return ;
+        }
+
         
     }, [])
 
@@ -40,7 +47,11 @@ function HomePage(props) {
         folderRequest()
         .then(
             data => {
-                setitemList([data.items]);
+                if (data) {
+                    setitemList(data);
+                }
+            },
+            error => {
             }
         )
     }
@@ -59,16 +70,16 @@ function HomePage(props) {
         };
 
         return (
-            fetch('api/class-list', requestOptions)
-            .then(handleResponse)
+            fetch(baseurl + '/api/class-list/', requestOptions)
+            .then(handleResponseJSON)
         )
     };
 
     // 강의실 입장 요청 함수
     const registerClassRequest = () => {
-        const url = 'api/class-entrance/' + classCode.toString();
+        const url = baseurl + '/api/class-entrance/' + classCode.toString();
         const requestOptions = {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': authHeader().Authorization
@@ -97,26 +108,50 @@ function HomePage(props) {
         };
 
         return (
-            fetch('/api/folder', requestOptions)
+            fetch(baseurl + '/api/folder/', requestOptions)
             .then(handleResponse)
         )
     }
 
-    const handleResponse = (response) => {
-        if (!response.status === 200) {
-            if (response.status === 400 || response.status === 401 || response.status === 404) {
-                window.location.reload(true);
+    const handleResponseJSON = (response) => {
+        return response.json().then(json => {
+            const data = json && JSON.parse(json);
+            if (!response.status === 200) {
+                if (response.status === 401) {
+                    // auto logout if 401 response returned from api
+                    logout();
+                    window.location.reload(true);
+                }
+    
+                const error = (data && data.message) || response.statusText;
+                return Promise.reject(error);
             }
-            const error = (data && data.message) || response.statusText;
-            return Promise.reject(error);
-        }
-        return response;
+    
+            return data;
+        });
+    }
+    const handleResponse = (response) => {
+        return response.text().then(json => {
+            const data = json && JSON.parse(json);
+            if (!response.status === 200) {
+                if (response.status === 401) {
+                    // auto logout if 401 response returned from api
+                    logout();
+                    window.location.reload(true);
+                }
+    
+                const error = (data && data.message) || response.statusText;
+                return Promise.reject(error);
+            }
+    
+            return data;
+        });
     }
 
     // 강의실 이동 함수
     const openFolder = (item)=> {
         // 페이지 리다이렉트
-        const url = '/class/' + item[0]
+        const url = '/class/' + item.id.toString();
         props.history.push(url);
     }
 
@@ -159,7 +194,7 @@ function HomePage(props) {
     // 강의실 추가 함수
     const addClass = () => {
         // 수강자 권한일 경우 
-        if (is_student === true) {
+        if (user.is_student === true) {
             // 폼 유효성 검사
             if (classCode === "") {
                 return alert('강의실 코드를 입력해주세요.')
@@ -233,19 +268,15 @@ function HomePage(props) {
                         {
                             itemList.map(function(item){
                                 return (
-                                    <div className="ListItem" onDoubleClick={()=>openFolder(item)} key={item[0]} >
+                                    <div className="ListItem" onDoubleClick={()=>openFolder(item)} key={item.id} >
                                         <div className="ListIconBox">
-                                        {
-                                            item[2] === true 
-                                            ? (<FontAwesomeIcon icon={faFolder} className="ListFolderIcon"/>)
-                                            : (<FontAwesomeIcon icon={faFileLines} className="ListFileIcon"/>)
-                                        }
+                                            <FontAwesomeIcon icon={faFolder} className="ListFolderIcon"/>
                                         </div>
                                         <div className="ListNameBox">
-                                            <p>{item[1]}</p>
+                                            <p>{item.name}</p>
                                         </div>
                                         <div className='ListOwner'>
-                                            <p>{item[3]}</p>
+                                            <p>{item.made_by}</p>
                                         </div>
                                     </div>
                                 )
@@ -256,16 +287,12 @@ function HomePage(props) {
                     <ul className="IconList">
                     {
                     itemList.map(item => (
-                        <li onDoubleClick={()=>openFolder(item)} key={item[0]}> 
+                        <li onDoubleClick={()=>openFolder(item)} key={item.id}> 
                             <div className="Iconbox">
-                                {
-                                    item[2] === true 
-                                    ? (<FontAwesomeIcon icon={faFolder} className="FolderIcon"/>)
-                                    : (<FontAwesomeIcon icon={faFileLines} className="FileIcon"/>)
-                                }
+                                <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
                             </div>
                             <div className="IconNameBox">
-                                <p>{item[1]}</p>
+                                <p>{item.name}</p>
                             </div>                     
                         </li>))
                     } 
@@ -280,7 +307,7 @@ function HomePage(props) {
                     <div className="modal">
                         <div className="modal-item">
                             {
-                                is_student === true
+                                user.is_student === true
                                 ? (
                                     <div className="modal-content">
                                         <p>강의실 입장</p>

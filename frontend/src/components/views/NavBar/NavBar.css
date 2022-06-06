@@ -14,31 +14,8 @@
 
 .NavbarRight {
     display:flex;
-    margin-right:50px;
-    
+    margin-right:170px;
     padding:0;
-    background:inherit;
-    cursor:pointer;
-}
-
-.bt1 {
-    display:flex;
-    margin-right:10px;
-    border:solid 1px #d0d2d4; 
-    border-radius:5px;
-    padding:10;
-    background:inherit;
-    cursor:pointer;
-}
-
-.bt2 {
-    display:flex;
-    margin-right:10px;
-    border:solid 1px #d0d2d4; 
-    border-radius:5px;
-    padding:10;
-    background:inherit;
-    cursor:pointer;
 }
 
 .NavbarLeft .NavbarLogo {
@@ -57,10 +34,15 @@
     font-weight:500;
 }
 
-.NavbarRight div {
-    margin:7px 15px;
-    font-size:0.8rem,
+.NavbarRight button {
+    margin:7px 7px;
+    font-size: 14px;
+    background:inherit;
+    border:solid 1px #d0d2d4; 
+    border-radius:5px;
+    padding: 5px 9px;
+    color: black;
 }
-.NavbarRight div:hover {
+.NavbarRight button:hover {
     text-decoration: underline;
 }

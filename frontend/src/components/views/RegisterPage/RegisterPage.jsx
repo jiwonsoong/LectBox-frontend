@@ -61,16 +61,30 @@ function RegisterPage(props) {
                 department: Department
             }
     
-            dispatch(userActions.register(body))
-            .then(response=> {
-                if (response.payload.success) {
-                    props.history.push("/login")
-                } else {
-                    alert("이미 존재하는 아이디입니다.")
-                }
-            })
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            };
+        
+            fetch(`http://localhost:8000/api/sign-up/`, requestOptions)
+            .then(handleResponse)
+            .then(response=>props.history.push("/login"),
+                error=>alert("이미 존재하는 아이디입니다.")
+            )
         }
     }
+    const handleResponse = (response) => {
+        if (!response.status === 200) {
+            if (response.status === 400 || response.status === 401 || response.status === 404) {
+                window.location.reload(true);
+            }
+            const error = (data && data.message) || response.statusText;
+            return Promise.reject(error);
+        }
+        return response;
+    }
+
 
     const checkInputs = ()=>{
         

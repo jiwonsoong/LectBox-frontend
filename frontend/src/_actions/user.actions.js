@@ -24,6 +24,7 @@ function login(id, pw, from) {
                 user => { 
                     dispatch(success(user));
                     history.push(from);
+                    window.location.reload();
                 },
                 error => {
                     dispatch(failure(error.toString()));
@@ -43,7 +44,7 @@ function logout() {
 }
 
 function register(dataToSubmit) {
-    const request = axios.post('/api/sign-up', dataToSubmit)
+    const request = axios.post('http://localhost:8000/api/sign-up', dataToSubmit)
     .then(response => response.data)
 
     return {

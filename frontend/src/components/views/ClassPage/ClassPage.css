@@ -99,6 +99,7 @@
     /* background-color: #00a4fc; */
     background-color: hsl(9, 100%, 77%);
     border-radius: 5px;
+    width: 0px;
 }
 
 .storage-box {

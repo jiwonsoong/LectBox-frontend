@@ -17,7 +17,7 @@ function LoginPage() {
 
     // reset login status
     useEffect(() => { 
-        dispatch(userActions.logout()); 
+        dispatch(userActions.logout());
     }, []);
 
     function handleChange(e) {
@@ -40,7 +40,7 @@ function LoginPage() {
         <div className="loginpage">
             <form name="form" onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label>이메일</label>
+                    <label>아이디</label>
                     <input type="text" name="id" value={id} onChange={handleChange} className={'form-control' + (submitted && !id ? ' is-invalid' : '')} />
                     {submitted && !id &&
                         <div className="invalid-feedback">이메일을 입력해주세요</div>
