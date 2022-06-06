@@ -197,7 +197,7 @@ function UserInfoPage(props){
                 </div>
                 <div className="UItem">
                     <p className="UItemTitle">아이디</p>
-                    <p>{UserInfo.id}</p>
+                    <p>{UserInfo.u_id}</p>
                 </div>
                 <div className="UItem">
                     <p className="UItemTitle">이메일</p>
