@@ -34,6 +34,7 @@ function HomePage(props) {
             setuser({
                 is_student: user.is_student
             })
+            
             setPage();
         } else {
             return ;
@@ -47,7 +48,7 @@ function HomePage(props) {
         folderRequest()
         .then(
             data => {
-                if (data) {
+                if (true) {
                     setitemList(data);
                 }
             },
@@ -126,7 +127,6 @@ function HomePage(props) {
                 const error = (data && data.message) || response.statusText;
                 return Promise.reject(error);
             }
-    
             return data;
         });
     }

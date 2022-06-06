@@ -6,13 +6,8 @@ import { store } from './_helpers';
 import { App } from './App';
 
 // setup fake backend
-<<<<<<< HEAD
-//import { configureFakeBackend } from './_helpers';
-//configureFakeBackend();
-=======
 // import { configureFakeBackend } from './_helpers';
 // configureFakeBackend();
->>>>>>> bddcc1ea9f01533e2518ae70d49b968f365405ad
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

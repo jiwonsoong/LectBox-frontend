@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
 import { faTrashCan, faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus } from '@fortawesome/free-solid-svg-icons'
 import { authHeader } from '../../../_helpers';
+import axios from 'axios';
 
 
 function ClassPage(props) {
@@ -20,7 +21,7 @@ function ClassPage(props) {
     const [isLect, setisLect] = useState() // 생성할 폴더의 위치 (강의면 true, 과제면 false)
     const [viewbutton, setviewbutton] =useState(false); // 폴더 수정 삭제 이동 버튼 노출 여부
     const [Lectviewbutton, setLectviewbutton] =useState(false); // 폴더 수정 삭제 이동 버튼 노출 여부
-    const [newFile, setnewFile] = useState(); // 업로드할 파일
+    const [newFile, setnewFile] = useState({}); // 업로드할 파일
     const [selectedItem, setselectedItem] = useState({id:'', is_folder: '', made_by:''}); // 선택된(삭제, 수정, 이동) 폴더 또는 파일 아이디
     const [user, setuser] = useState({}); // 유저 정보
     const baseurl = 'http://localhost:8000';
@@ -48,6 +49,13 @@ function ClassPage(props) {
             colorBar();
         }
     }, [folderInfo])
+
+    //파일 객체 설정후 동작
+    useEffect(()=>{
+        if(!isEmptyObj(newFile)){
+            onFileSubmitHandler()
+        }
+    },[newFile])
 
     // 빈 객체 확인 함수
     const isEmptyObj = (obj) => {
@@ -274,26 +282,22 @@ function ClassPage(props) {
         let parentId = '';
 
         if (isLect === true) {
-            parentId = folderInfo.lectureid;
+            parentId = folderInfo.lectureId.toString();
         } else {
-            parentId = folderInfo.assignId;
+            parentId = folderInfo.assignId.toString();
         }
 
-        const url = baseurl + '/api/folder/' + parentId.toString() + '/file/';
+        const url = baseurl + '/api/folder/' + parentId + '/file/';
 
         const requestOptions = {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                //'Content-Type': 'multipart/form-data',
                 'Authorization': authHeader().Authorization
             },
-            body: JSON.stringify({
-                parent: parentId,
-                FILES: formData,
-                is_protected: false
-            })
+            body: formData
         };
-
+        console.log();
         return (
             fetch(url, requestOptions)
             .then(handleResponse)
@@ -384,15 +388,36 @@ function ClassPage(props) {
     // 업로드할 파일 입력 함수
     const onFileHandler = (event)=>{
         setnewFile(event.target.files[0]);
-        onFileSubmitHandler();
+        //onFileSubmitHandler();
     }
     // 파일 업로드 함수
     const onFileSubmitHandler = ()=> {
         // event.preventDefault();
 
+        console.log(newFile);
+
+        /*let parentId = '';
+
+        if (isLect === true) {
+            parentId = folderInfo.lectureId.toString();
+        } else {
+            parentId = folderInfo.assignId.toString();
+        }
+
+        const url = baseurl + '/api/folder/' + parentId + '/file/';
+
         const formData = new FormData();
         formData.append('file', newFile);
 
+        axios({
+            method: "post",
+            url: url,
+            data: formData,
+            headers: { "Content-Type": "multipart/form-data", Authorization: authHeader().Authorization }
+        });*/
+        const formData = new FormData();
+        formData.append('file', newFile);
+        console.log(formData);
         addFileRequest(formData)
         .then(
             data => { 
@@ -429,6 +454,7 @@ function ClassPage(props) {
     const deleteItem = () => {
         // 폴더 삭제
         if (selectedItem.is_folder === true) {
+        
             if (user.id === selectedItem.made_by) { 
                 deleteFolderRequest()
                 .then(
@@ -475,6 +501,7 @@ function ClassPage(props) {
                     document.getElementById(selectedItem.id).style.backgroundColor = 'white';
                     setselectedItem({id: item.id, made_by: item.made_by});
                     document.getElementById(item.id).style.backgroundColor = '#efefef';
+                    console.log("sected");
                 } 
                 // 기존에 선택된 게 없는 경우 
                 else {

@@ -34,6 +34,8 @@ function UserInfoPage(props){
             return ;
         }
     }, []);
+
+    
     
     const onNameHandler = (event) => {
         setName(event.currentTarget.value)
@@ -63,11 +65,15 @@ function UserInfoPage(props){
             }
     
             EditUserRequest(body)
-            .then( ()=> {
-                alert('변경되었습니다.')
-            })
-        } else {
-            alert('변경 권한이 없습니다')
+            .then(
+                data => {
+                    setUserInfo(data);
+                    alert('변경되었습니다.');
+                },
+                error => {
+                    alert('변경 권한이 없습니다.')
+                }
+            )
         }
     }
 
@@ -103,7 +109,7 @@ function UserInfoPage(props){
     }
 
 
-    const user_pass = '1234'
+    const user_id = 'olivetree421';
 
     
 
@@ -144,7 +150,7 @@ function UserInfoPage(props){
     }
 
     const deleteUser = () => {
-        if (user_pass === UserInfo.u_password) {
+        if (user_id === UserInfo.u_id) {
             deleteRequest()
             .then(
                 ()=>{
@@ -153,6 +159,7 @@ function UserInfoPage(props){
                 }
             )
         } else {
+            console.log(UserInfo.u_id);
             alert('삭제 권한이 없습니다.')
         }
     }
@@ -225,7 +232,7 @@ function UserInfoPage(props){
                 </div>
                 <div className="UItem">
                     <button onClick={() => {setviewinput(true);}}>변경</button>
-                    <button type="submit">확인</button>
+                    <button type="submit" onClick={onSubmitHandler}>확인</button>
                 </div>
                 <div className="UItem">
                     <button className="UButton" onClick={deleteUser}>회원탈퇴</button>
