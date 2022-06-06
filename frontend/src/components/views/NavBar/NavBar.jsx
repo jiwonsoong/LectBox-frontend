@@ -1,27 +1,39 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
 import logoImage from '../../../img/logoText.jpg';
+import { authHeader } from '../../../_helpers';
 import './NavBar.css'
 
 function NavBar() {
-    // dummy
-    const userName = '손지원'
-    const Is_student = true
-    let loginState = true
+    const [loginState, setloginState] = useState();
+    const [userId, setuserId] = useState();
+    const [userName, setuserName] = useState();
+    const [Is_student, setIs_student] = useState();
+    const [auth, setauth] = useState();
 
-    let auth = ""
-    if (Is_student === true) auth = "학생"
-    else auth = "강의자"
+    const link = "/user"
 
-    let title = ""
-    // root면 userName으로, 강의실이면 강좌 이름으로
-    title = "손지원"
-    let link = ""
-    // 
-    link = "/user"
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        // 로그인 된 상태
+        if(user) {
+            setloginState(true);
+            setuserId(user.id);
+            setuserName(user.name);
+            setIs_student(user.is_student);
+            if (Is_student) setauth('수강자');
+            else setauth('강의자');
+        } 
+        // 로그인 안 된 상태
+        else {
+            setloginState(false);
+        }
+    }, )
+    
 
     function logout() {
         alert('로그아웃 되었습니다.');
+        window.location.reload();
         localStorage.removeItem('user');
     }
 
@@ -43,12 +55,10 @@ function NavBar() {
             {
                 loginState===true
                 ? (
-                    <>
                     <div className='NavbarRight'>
-                        <button className='bt1' style={{color:'black', fontSize: '14px'}}><Link to="/userinfo">{userName} ({auth})</Link></button>
-                        <button onClick={logout} className='bt2' style={{color:'black', fontSize: '14px'}}><Link to="/login" >로그아웃</Link></button>
+                        <button><Link to="/userinfo">{userName} ({auth})</Link></button>
+                        <button onClick={logout}><Link to="/login" >로그아웃</Link></button>
                     </div>
-                    </>
                )
                 : (<div></div>)
             }
