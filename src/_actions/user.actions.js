@@ -27,6 +27,7 @@ function login(id, pw, from) {
                     window.location.reload();
                 },
                 error => {
+                    alert("비밀번호가 틀렸습니다.");
                     dispatch(failure(error.toString()));
                     dispatch(alertActions.error(error.toString()));
                 }

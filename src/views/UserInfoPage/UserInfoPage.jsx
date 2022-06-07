@@ -28,7 +28,12 @@ function UserInfoPage(props){
                 u_email: data.email,
                 u_password: data.password, 
                 is_student: data.is_student,
+<<<<<<< HEAD:frontend/src/components/views/UserInfoPage/UserInfoPage.jsx
+                u_school: data.school,
+                u_subject: data.department    
+=======
                     
+>>>>>>> 6b2d890823a5aaa34ef8a99f53cebd22138ad09b:src/views/UserInfoPage/UserInfoPage.jsx
                 })
             });
         } else {
@@ -36,6 +41,31 @@ function UserInfoPage(props){
         }
     }, []);
 
+<<<<<<< HEAD:frontend/src/components/views/UserInfoPage/UserInfoPage.jsx
+    useEffect(()=>{
+        
+        UserRequest()
+        .then((data) => {
+            console.log(data);
+
+            setUserInfo({
+            u_id: data.id,
+            u_name: data.name,
+            u_email: data.email,
+            u_password: data.password, 
+            is_student: data.is_student,
+            u_school: data.school,
+            u_subject: data.department    
+            })
+        });
+
+    }, [UserInfo]);
+
+    
+    
+    const onNameHandler = (event) => {
+        setName(event.currentTarget.value)
+=======
 
     /**
      * 요청
@@ -71,6 +101,7 @@ function UserInfoPage(props){
         return (fetch(url, requestOptions)
                 .then(handleResponse)
         )
+>>>>>>> 6b2d890823a5aaa34ef8a99f53cebd22138ad09b:src/views/UserInfoPage/UserInfoPage.jsx
     }
     // 회원탈퇴 요청
     const deleteRequest = () => {

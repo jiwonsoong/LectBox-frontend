@@ -444,13 +444,13 @@ function ClassPage(props) {
     // 폴더, 파일 삭제 함수
     const deleteItem = () => {
         // 폴더 삭제
-        console.log(selectedItem.is_folder);
-        console.log(selectedItem);
+        
         if (true) { 
-            deleteFolderRequest()
+            console.log("file");
+            deleteFileRequest()
             .then(
                 ()=>{
-                    alert('폴더가 삭제되었습니다.');
+                    alert('파일이 삭제되었습니다.');
                     setFolder();
                 },
                 ()=>{

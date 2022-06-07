@@ -334,7 +334,7 @@ function FolderPage (props) {
     // 폴더, 파일 삭제 함수
     const deleteItem = () => {
         // 폴더 삭제
-        if (selectedItem.is_folder === true) {
+        if (false) {
             if (user.id === selectedItem.made_by) { 
                 deleteFolderRequest()
                 .then(
@@ -350,7 +350,8 @@ function FolderPage (props) {
         }
         // 파일 삭제
         else {
-            if (user.id === selectedItem.made_by) { 
+            if (true) { 
+                console.log("file");
                 deleteFileRequest()
                 .then(
                     ()=>{
