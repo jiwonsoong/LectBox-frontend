@@ -1,6 +1,6 @@
 import { faDollyFlatbed } from "@fortawesome/free-solid-svg-icons";
 import React, { useEffect, useState } from "react"
-import { authHeader } from "../../../_helpers";
+import { authHeader } from "../../_helpers";
 import './UserInfoPage.css';
 
 function UserInfoPage(props){

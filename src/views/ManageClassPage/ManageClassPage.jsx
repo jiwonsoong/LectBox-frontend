@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import './ManageClassPage.css';
-import { authHeader } from "../../../_helpers";
+import { authHeader } from "../../_helpers";
 
 function ManageClassPage(props) {
 	// const { params } = props.match;
-	const [folderInfo, setfolderInfo] = useState({f_id: path.pro, f_name: "unknown", manager: "unknown"});
     const [user, setuser] = useState({});
     const baseurl = 'http://3.231.84.43:8000';
     const path = JSON.parse(localStorage.getItem('path'));
+	const [folderInfo, setfolderInfo] = useState({f_id: path.pro, f_name: "unknown", manager: "unknown"});
 
     // 페이지 첫 렌더링 시 동작
     useEffect(() => {
@@ -37,6 +37,8 @@ function ManageClassPage(props) {
      */
     // 폴더 정보 요청 함수
     const folderRequest = () => {
+        console.log(path)
+        console.log(path.pro)
         const url = baseurl + "/api/folder/" + path.pro + "/0";
         const requestOptions = {
         method: "GET",

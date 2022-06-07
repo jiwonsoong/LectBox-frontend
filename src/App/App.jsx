@@ -4,14 +4,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { history } from '../_helpers';
 import { alertActions } from '../_actions';
 import { PrivateRoute } from '../_Pageroute';
-import { HomePage } from '../components/views/HomePage';
-import { LoginPage } from '../components/views/LoginPage/LoginPage';
-import { RegisterPage } from "../components/views/RegisterPage/RegisterPage";
-import { NavBar } from '../components/views/NavBar';
-import { ClassPage } from '../components/views/ClassPage';
-import { FolderPage } from '../components/views/FolderPage/FolderPage';
-import { ManageClassPage } from '../components/views/ManageClassPage/ManageClassPage';
-import { UserInfoPage } from '../components/views/UserInfoPage/UserInfoPage';
+import { HomePage } from '../views/HomePage';
+import { LoginPage } from '../views/LoginPage/LoginPage';
+import { RegisterPage } from "../views/RegisterPage/RegisterPage";
+import { NavBar } from '../views/NavBar';
+import { ClassPage } from '../views/ClassPage';
+import { FolderPage } from '../views/FolderPage/FolderPage';
+import { ManageClassPage } from '../views/ManageClassPage/ManageClassPage';
+import { UserInfoPage } from '../views/UserInfoPage/UserInfoPage';
 
 
 function App() {

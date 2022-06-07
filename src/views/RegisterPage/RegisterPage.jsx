@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { userActions } from '../../../_actions';
+import { userActions } from '../../_actions';
 import './RegisterPage.css';
 
 function RegisterPage(props) {
@@ -69,8 +69,12 @@ function RegisterPage(props) {
         
             fetch(`http://3.231.84.43:8000/api/sign-up/`, requestOptions)
             .then(handleResponse)
-            .then(response=>props.history.push("/login"),
-                error=>alert("이미 존재하는 아이디입니다.")
+            .then(
+                response => {
+                    props.history.push("/login");
+                },
+                error => 
+                    alert("이미 존재하는 아이디입니다.")
             )
         }
     }
@@ -207,12 +211,12 @@ function RegisterPage(props) {
                 
                 <div className='register-group'>
                     <label className='info-group'>학교</label>
-                    <input className="form-control" type="text" value={School} onChange={onSchoolHandler} />
+                    <input className="form-control" type="text" value={School} onChange={onSchoolHandler} placeholder='예) ㅇㅇ대학교'/>
                 </div>
 
                 <div className='register-group'>
                     <label className='info-group'>학과</label>
-                    <input className="form-control" type="text" value={Department} onChange={onDepartmentHandler} />
+                    <input className="form-control" type="text" value={Department} onChange={onDepartmentHandler} placeholder='예) ㅇㅇ학과 또는 ㅇㅇ학부'/>
                 </div>        
                 <br />
                 <div  className="form-group">

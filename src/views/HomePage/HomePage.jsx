@@ -3,7 +3,7 @@ import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
 import { faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge } from '@fortawesome/free-solid-svg-icons'
-import { authHeader } from "../../../_helpers";
+import { authHeader } from "../../_helpers";
 
 function HomePage(props) {
     // 컴포넌트 State

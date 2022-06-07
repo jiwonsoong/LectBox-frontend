@@ -3,7 +3,7 @@ import './FolderPage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
 import { faTrashCan, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus } from '@fortawesome/free-solid-svg-icons'
-import { authHeader } from '../../../_helpers';
+import { authHeader } from '../../_helpers';
 import { useParams } from 'react-router-dom';
 import { createBrowserHistory } from "history";
 
@@ -237,8 +237,6 @@ function FolderPage (props) {
             const data = json && JSON.parse(json);
             if (response.status !== 200) {
                 if (response.status === 401) {
-                    // auto logout if 401 response returned from api
-                    logout();
                     window.location.reload(true);
                 }
     

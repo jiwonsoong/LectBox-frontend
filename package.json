@@ -25,7 +25,10 @@
   },
   "scripts": {
     "build": "react-scripts build",
-    "start": "webpack-dev-server --open"
+    "start": "webpack-dev-server --open",
+    "deploy": "aws s3 sync ./build s3://lectbox --profile=test-jiwon",
+    "invalidation": "aws cloudfront create-invalidation --profil=test-jiwon --distribution-id E1SE5MBJK5DE5I --paths / /public /src",
+    "all": "npm run all -s build deploy invalidaton"
   },
   "eslintConfig": {
     "extends": [

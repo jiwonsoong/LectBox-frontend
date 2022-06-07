@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
-import logoImage from '../../../img/logoText.jpg';
-import { authHeader } from '../../../_helpers';
+import logoImage from '../../img/logoText.jpg';
+import { authHeader } from '../../_helpers';
 import './NavBar.css'
 
 function NavBar() {
