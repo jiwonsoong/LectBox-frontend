@@ -12,7 +12,7 @@ function FolderPage (props) {
     const [sort, setsort] = useState('name'); // time, name
     const [isViewAddModal, setisViewAddModal] = useState(false); // 폴더 생성 모달 노출 여부
     const [newFolderName, setnewFolderName] = useState('') // 생성할 폴더 이름
-    const [newFile, setnewFile] = useState() // 업로드할 파일
+    const [newFile, setnewFile] = useState({}); // 업로드할 파일
     const [folderInfo, setfolderInfo] = useState({}); // 현재 폴더 정보
     const [folderItems, setfolderItems] = useState([]) // 폴더 안 하위 내용 
     const [folderPath, setfolderPath] = useState([]) // 폴더 경로
@@ -53,6 +53,13 @@ function FolderPage (props) {
         colorBar();
 
     }, [folderInfo])
+
+    //파일 객체 설정후 동작
+    useEffect(()=>{
+        if(!isEmptyObj(newFile)){
+            onFileSubmitHandler()
+        }
+    },[newFile])
 
     // 빈 객체 확인 함수
     const isEmptyObj = (obj) => {
@@ -157,14 +164,10 @@ function FolderPage (props) {
         const requestOptions = {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                //'Content-Type': 'application/json',
                 'Authorization': authHeader().Authorization
             },
-            body: JSON.stringify({
-                parent: folderInfo.id,
-                FILES: formData,
-                is_protected: false
-            })
+            body: formData
         };
 
         return (
@@ -209,7 +212,7 @@ function FolderPage (props) {
     const handleResponse = (response) => {
         return response.text().then(json => {
             const data = json && JSON.parse(json);
-            if (!response.status === 200) {
+            if (response.status !== 200) {
                 if (response.status === 401) {
                     // auto logout if 401 response returned from api
                     logout();
@@ -285,7 +288,7 @@ function FolderPage (props) {
     // 업로드할 파일 입력 함수
     const onFileHandler = (event)=>{
         setnewFile(event.target.files[0]);
-        onFileSubmitHandler();
+        //onFileSubmitHandler();
     }
     // 파일 업로드 함수
     const onFileSubmitHandler = ()=> {

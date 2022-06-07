@@ -86,7 +86,7 @@ function HomePage(props) {
                 'Authorization': authHeader().Authorization
             }
         };
-
+        console.log();
         return (
             fetch(url, requestOptions)
             .then(handleResponse)
@@ -133,7 +133,8 @@ function HomePage(props) {
     const handleResponse = (response) => {
         return response.text().then(json => {
             const data = json && JSON.parse(json);
-            if (!response.status === 200) {
+            if (response.status !== 200) {
+                console.log(response.status);
                 if (response.status === 401) {
                     // auto logout if 401 response returned from api
                     logout();
@@ -143,7 +144,7 @@ function HomePage(props) {
                 const error = (data && data.message) || response.statusText;
                 return Promise.reject(error);
             }
-    
+            
             return data;
         });
     }
@@ -206,6 +207,9 @@ function HomePage(props) {
                     setPage();
                     closeModal()
                     alert("입장되었습니다.")
+                },
+                error => {
+                    alert('그런 강의실은 없습니다')
                 }
             )
         }

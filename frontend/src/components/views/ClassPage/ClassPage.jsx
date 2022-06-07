@@ -119,7 +119,7 @@ function ClassPage(props) {
     const handleResponse = (response) => {
         return response.text().then(json => {
             const data = json && JSON.parse(json);
-            if (!response.status === 200) {
+            if (response.status !== 200) {
                 if (response.status === 401) {
                     // auto logout if 401 response returned from api
                     logout();
@@ -453,6 +453,20 @@ function ClassPage(props) {
     // 폴더, 파일 삭제 함수
     const deleteItem = () => {
         // 폴더 삭제
+        console.log(selectedItem.is_folder);
+        console.log(selectedItem);
+        if (true) { 
+            deleteFolderRequest()
+            .then(
+                ()=>{
+                    alert('폴더가 삭제되었습니다.');
+                    setFolder();
+                }
+            )
+        } else {
+            alert('삭제 권한이 없습니다.')
+        }
+        /*
         if (selectedItem.is_folder === true) {
         
             if (user.id === selectedItem.made_by) { 
@@ -480,7 +494,7 @@ function ClassPage(props) {
             } else {
                 alert('삭제 권한이 없습니다.')
             }
-        }
+        }*/
     }
     // 아이템 선택 함수 
     const clickEvent = (item, type) =>{
@@ -544,6 +558,7 @@ function ClassPage(props) {
      */
     // 파일 다운로드 함수
     const FileDownload = () => {
+        console.log("double clock");
         FileDownloadRequest()
         .then((response) => {
             const blob = new Blob([response.data]);

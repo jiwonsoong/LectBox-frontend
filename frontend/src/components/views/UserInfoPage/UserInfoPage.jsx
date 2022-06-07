@@ -150,7 +150,7 @@ function UserInfoPage(props){
     }
 
     const deleteUser = () => {
-        if (user_id === UserInfo.u_id) {
+        if (UserInfo.u_id) {
             deleteRequest()
             .then(
                 ()=>{
