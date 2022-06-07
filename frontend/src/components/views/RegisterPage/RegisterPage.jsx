@@ -10,7 +10,7 @@ function RegisterPage(props) {
     const [Id, setId] = useState("")
     const [Password, setPassword] = useState("")
     const [ConfirmPassword, setConfirmPassword] = useState("")
-    const [IsStudent, setIsStudent] = useState("")
+    const [IsStudent, setIsStudent] = useState(false);
     const [Name, setName] = useState("")
     const [Email, setEmail] = useState("")
     const [School, setSchool] = useState("")

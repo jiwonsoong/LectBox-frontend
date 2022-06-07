@@ -27,13 +27,34 @@ function UserInfoPage(props){
                 u_name: data.name,
                 u_email: data.email,
                 u_password: data.password, 
-                is_student: data.is_student    
+                is_student: data.is_student,
+                u_school: data.school,
+                u_subject: data.department    
                 })
             });
         } else {
             return ;
         }
     }, []);
+
+    useEffect(()=>{
+        
+        UserRequest()
+        .then((data) => {
+            console.log(data);
+
+            setUserInfo({
+            u_id: data.id,
+            u_name: data.name,
+            u_email: data.email,
+            u_password: data.password, 
+            is_student: data.is_student,
+            u_school: data.school,
+            u_subject: data.department    
+            })
+        });
+
+    }, [UserInfo]);
 
     
     
@@ -68,6 +89,7 @@ function UserInfoPage(props){
             .then(
                 data => {
                     setUserInfo(data);
+                    setviewinput(false);
                     alert('변경되었습니다.');
                 },
                 error => {
