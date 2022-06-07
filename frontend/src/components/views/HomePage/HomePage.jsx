@@ -118,11 +118,6 @@ function HomePage(props) {
         return response.json().then(json => {
             const data = json && JSON.parse(json);
             if (!response.status === 200) {
-                if (response.status === 401) {
-                    // auto logout if 401 response returned from api
-                    logout();
-                    window.location.reload(true);
-                }
     
                 const error = (data && data.message) || response.statusText;
                 return Promise.reject(error);
@@ -136,8 +131,6 @@ function HomePage(props) {
             if (response.status !== 200) {
                 console.log(response.status);
                 if (response.status === 401) {
-                    // auto logout if 401 response returned from api
-                    logout();
                     window.location.reload(true);
                 }
     
@@ -152,7 +145,8 @@ function HomePage(props) {
     // 강의실 이동 함수
     const openFolder = (item)=> {
         // 페이지 리다이렉트
-        const url = '/class/' + item.id.toString();
+        const url = '/class';
+        localStorage.setItem('path', JSON.stringify({pre: '', pro: item.id, post: ''}));
         props.history.push(url);
     }
 
@@ -208,8 +202,8 @@ function HomePage(props) {
                     closeModal()
                     alert("입장되었습니다.")
                 },
-                error => {
-                    alert('그런 강의실은 없습니다')
+                error=>{
+                    alert("강의실이 존재하지 않습니다.")
                 }
             )
         }

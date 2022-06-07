@@ -12,7 +12,7 @@ function ClassPage(props) {
     // 컴포넌트 State
     const [view, setview] = useState('list'); // icon, list
     const [sort, setsort] = useState('name'); // time, name
-    const { params } = props.match
+    // const { params } = props.match
     const [lectItems, setlectItems] = useState([]); // 강의 폴더의 하위 내용
     const [assignItems, setassignItems] = useState([]); // 과제 폴더의 하위 내용
     const [folderInfo, setfolderInfo] = useState({}); // 현재 폴더 정보
@@ -25,6 +25,7 @@ function ClassPage(props) {
     const [selectedItem, setselectedItem] = useState({id:'', is_folder: '', made_by:''}); // 선택된(삭제, 수정, 이동) 폴더 또는 파일 아이디
     const [user, setuser] = useState({}); // 유저 정보
     const baseurl = 'http://localhost:8000';
+    const path = JSON.parse(localStorage.getItem('path'));
 
 
     // 페이지 첫 렌더링 시 동작
@@ -40,7 +41,13 @@ function ClassPage(props) {
         } else {
             return ;
         }
+
+        return ()=>{
+            // localStorage.removieItem('path');
+        }
     }, [])
+
+    
 
     // 폴더 정보 받아온 후 동작
     useEffect(()=>{
@@ -135,7 +142,7 @@ function ClassPage(props) {
     }
     // 강의실 정보 요청 함수 
     const folderInfoRequest = ()=>{
-        const url = baseurl + '/api/folder/' + params.classid;
+        const url = baseurl + '/api/folder/' + path.pro;
 
         const requestOptions = {
             method: 'GET',
@@ -313,7 +320,7 @@ function ClassPage(props) {
             }
         };
 
-        const url = baseurl + '/api/foler/' + parentId.toString() + '/file/' + selectedItem.id.toString() + '/downloads';
+        const url = baseurl + '/api/foler/' + path.pro.toString() + '/file/' + selectedItem.id.toString() + '/downloads';
 
         return (
             fetch(url,requestOptions)
@@ -394,27 +401,6 @@ function ClassPage(props) {
     const onFileSubmitHandler = ()=> {
         // event.preventDefault();
 
-        console.log(newFile);
-
-        /*let parentId = '';
-
-        if (isLect === true) {
-            parentId = folderInfo.lectureId.toString();
-        } else {
-            parentId = folderInfo.assignId.toString();
-        }
-
-        const url = baseurl + '/api/folder/' + parentId + '/file/';
-
-        const formData = new FormData();
-        formData.append('file', newFile);
-
-        axios({
-            method: "post",
-            url: url,
-            data: formData,
-            headers: { "Content-Type": "multipart/form-data", Authorization: authHeader().Authorization }
-        });*/
         const formData = new FormData();
         formData.append('file', newFile);
         console.log(formData);
@@ -437,12 +423,13 @@ function ClassPage(props) {
      */
     // 폴더 열기 함수
     const onFolderHandler = (folderId) => {
-        const url = '/folder/' + folderId.toString();
+        const url = '/folder';
+        localStorage.setItem('path', JSON.stringify({pre: path.pro, pro: folderId, post: ''}));
         props.history.push(url);
     }
     // 강의실 관리 페이지 이동 함수 
     const linkToManagePage = () => {
-        const url = '/class/' + folderInfo.id.toString() + '/manage';
+        const url = '/class/manage';
         props.history.push(url);
     }
 
@@ -488,7 +475,7 @@ function ClassPage(props) {
                 .then(
                     ()=>{
                         alert('파일이 삭제되었습니다.');
-                        setPage();
+                        setFolder();
                     }
                 )
             } else {
@@ -601,6 +588,7 @@ function ClassPage(props) {
 
     return (
         <div className="ClassPage" >
+            <button onClick={()=>{console.log(lectItems, assignItems)}}>클릭</button>
             <div className="CContainer">
                 {/* 강의실 이름 */}
                 <div className='CCategory'>
