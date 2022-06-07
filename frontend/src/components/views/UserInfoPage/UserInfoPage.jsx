@@ -114,7 +114,7 @@ function UserInfoPage(props){
     
 
     function onChangetext (e){
-        setuserInfo.u_password(e.target.value);
+        // UserInfo.u_password(e.target.value);
     }
 
     const UserRequest = () => {
@@ -186,9 +186,6 @@ function UserInfoPage(props){
             const data = json && JSON.parse(json);
             if (!response.status === 200) {
                 if (response.status === 401) {
-                    // auto logout if 401 response returned from api
-                    logout();
-                    window.location.reload(true);
                 }
     
                 const error = (data && data.message) || response.statusText;

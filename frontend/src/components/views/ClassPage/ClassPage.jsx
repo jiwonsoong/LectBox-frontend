@@ -315,7 +315,7 @@ function ClassPage(props) {
             }
         };
 
-        const url = baseurl + '/api/foler/' + parentId.toString() + '/file/' + selectedItem.id.toString() + '/downloads';
+        const url = baseurl + '/api/foler/' + path.pro.toString() + '/file/' + selectedItem.id.toString() + '/downloads';
 
         return (
             fetch(url,requestOptions)
@@ -425,7 +425,6 @@ function ClassPage(props) {
     // 강의실 관리 페이지 이동 함수 
     const linkToManagePage = () => {
         const url = '/class/manage';
-        localStorage.setItem('path', JSON.stringify({pre: path.pro, pro: folderId, post: ''}));
         props.history.push(url);
     }
 
@@ -457,7 +456,7 @@ function ClassPage(props) {
                 .then(
                     ()=>{
                         alert('파일이 삭제되었습니다.');
-                        setPage();
+                        setFolder();
                     }
                 )
             } else {

@@ -75,14 +75,16 @@ function RegisterPage(props) {
         }
     }
     const handleResponse = (response) => {
-        if (!response.status === 200) {
-            if (response.status === 400 || response.status === 401 || response.status === 404) {
-                window.location.reload(true);
+        return response.text().then(json => {
+            const data = json && JSON.parse(json);
+            if (!response.status === 200) {
+    
+                const error = (data && data.message) || response.statusText;
+                return Promise.reject(error);
             }
-            const error = (data && data.message) || response.statusText;
-            return Promise.reject(error);
-        }
-        return response;
+            
+            return data;
+        });
     }
 
 
