@@ -100,6 +100,7 @@ function ClassPage(props) {
         .then(
             data => {
                 if (data.items) {
+                    console.log(data)
                     setlectItems(data.items);
                 }
             }
@@ -397,7 +398,6 @@ function ClassPage(props) {
     // 업로드할 파일 입력 함수
     const onFileHandler = (event)=>{
         setnewFile(event.target.files[0]);
-        //onFileSubmitHandler();
     }
     // 파일 업로드 함수
     const onFileSubmitHandler = ()=> {
@@ -428,7 +428,7 @@ function ClassPage(props) {
     // 폴더 열기 함수
     const onFolderHandler = (folderId) => {
         const url = '/folder';
-        localStorage.setItem('path', JSON.stringify({pre: path.pro, pro: folderId, post: ''}));
+        localStorage.setItem('path', JSON.stringify({pro: folderId, class: path.class, className: path.className}));
         props.history.push(url);
     }
     // 강의실 관리 페이지 이동 함수 
@@ -626,13 +626,13 @@ function ClassPage(props) {
                                 : (<div title="리스트 보기"><FontAwesomeIcon icon={faTableList} /></div>)
                             }
                         </div>
-                        <div onClick={onSortHandler} className='SetViewElement'>
+                        {/* <div onClick={onSortHandler} className='SetViewElement'>
                             {
                                 sort === 'name'
                                 ? (<div title="최신순"><FontAwesomeIcon icon={faArrowDown19} /></div>)
                                 : (<div title="이름순"><FontAwesomeIcon icon={faArrowDownAZ} /></div>)
                             }
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 {/* 강의란 */}
@@ -681,6 +681,7 @@ function ClassPage(props) {
                             <div className="ListColDescription">
                                 <div className='ListColLeft'>이름</div>
                                 <div>소유자</div>
+                                <div className="volumeTitle">용량</div>
                             </div>
                             {
                                 lectItems.map(function(item){
@@ -696,12 +697,18 @@ function ClassPage(props) {
                                             <div className='ListNameBox'>
                                                 {
                                                     item.is_folder === true
-                                                    ? (<p onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: ''}, 1)} onDoubleClick={()=>onFolderHandler(item.child)}>{item.name}</p>)
-                                                    : (<p onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: ''}, 1)} onDoubleClick={()=>FileDownload} >{item.name}</p>)
+                                                    ? (<div onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: ''}, 1)} onDoubleClick={()=>onFolderHandler(item.child)}>{item.name}</div>)
+                                                    : (<div onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: ''}, 1)} onDoubleClick={()=>FileDownload} >{item.name}</div>)
                                                 }
                                             </div>
                                             <div className='ListOwner'>
-                                                <p>{''}</p>
+                                                <p>{item.child_made_by_name}</p>
+                                            </div>
+                                            <div className='ListVolume'>
+                                                {
+                                                    item.is_folder === false &&
+                                                    (<div>{item.child_volume}{'KB'}</div>)
+                                                }
                                             </div>
                                         </div>
                                     )
@@ -717,16 +724,16 @@ function ClassPage(props) {
                                     item.is_folder === true 
                                     ? (
                                     <div className="Iconbox" onDoubleClick={()=>onFolderHandler(item.child)}>
-                                        <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
+                                        <FontAwesomeIcon title={item.name} icon={faFolder} className="FolderIcon"/>
                                     </div>
                                     )
                                     : (
                                     <div className="Iconbox" onDoubleClick={FileDownload}>
-                                        <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
+                                        <FontAwesomeIcon title={item.name} icon={faFileLines} className="FileIcon"/>
                                     </div>
                                     )
                                 }
-                                    <div className="IconNameBox">
+                                    <div title={item.name} className="IconNameBox">
                                         <p>{item.name}</p>
                                     </div>             
                                 </li>
@@ -781,6 +788,7 @@ function ClassPage(props) {
                             <div className="ListColDescription">
                                 <div className='ListColLeft'>이름</div>
                                 <div>소유자</div>
+                                <div className="volumeTitle">용량</div>
                             </div>
                             {
                                 assignItems.map(function(item){
@@ -801,7 +809,13 @@ function ClassPage(props) {
                                                 }
                                             </div>
                                             <div className='ListOwner'>
-                                                <p>{''}</p>
+                                                <p>{item.child_made_by_name}</p>
+                                            </div>
+                                            <div className='ListVolume'>
+                                                {
+                                                    item.is_folder === false &&
+                                                    (<div>{item.child_volume}{'KB'}</div>)
+                                                }
                                             </div>
                                         </div>
                                     )
@@ -817,16 +831,16 @@ function ClassPage(props) {
                                     item.is_folder === true 
                                     ? (
                                     <div className="Iconbox" onDoubleClick={()=>onFolderHandler(item)}>
-                                        <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
+                                        <FontAwesomeIcon title={item.name} icon={faFolder} className="FolderIcon"/>
                                     </div>
                                     )
                                     : (
                                     <div className="Iconbox" >
-                                        <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
+                                        <FontAwesomeIcon title={item.name} icon={faFileLines} className="FileIcon"/>
                                     </div>
                                     )
                                 }
-                                    <div className="IconNameBox">
+                                    <div title={item.name} className="IconNameBox">
                                         <p>{item.name}</p>
                                     </div>                
                                 </li>
