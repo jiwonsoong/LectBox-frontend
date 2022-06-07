@@ -206,7 +206,7 @@ function FolderPage (props) {
     }
     // 파일 삭제 요청 함수
     const deleteFileRequest = ()=>{
-        const url = baseurl + '/api/foler/' + folderInfo.id.toString() + '/file/' + selectedItem.id.toString();
+        const url = baseurl + '/api/folder/' + folderInfo.id.toString() + '/file/' + selectedItem.id.toString();
         
         const requestOptions = {
             method: 'DELETE',
