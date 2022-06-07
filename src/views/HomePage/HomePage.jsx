@@ -15,16 +15,6 @@ function HomePage(props) {
     const [user, setuser] = useState({}); // 유저 정보 
     const baseurl = 'http://3.231.84.43:8000'
 
-    // dummy data
-    // const itemList = [['folder1','캡스톤디자인', true, '이원희'], 
-    //     ['folder2','클라우드컴퓨팅',true, '김재홍'], 
-    //     ['folder3','클라우드컴퓨팅',true, '김재홍'], 
-    //     ['folder4','클라우드컴퓨팅',true, '김재홍'], 
-    //     ['folder5','클라우드컴퓨팅',true, '김재홍'], 
-    //     ['folder6','클라우드컴퓨팅',false, '김재홍'], 
-    //     ['folder7','클라우드컴퓨팅',true, '김재홍'],
-    // ]
-
     // 페이지 첫 렌더링 시 동작
     useEffect(() => {
         // 폴더 정보 요청하여 강의실 리스트 생성
@@ -220,7 +210,8 @@ function HomePage(props) {
                     setPage();
                     closeModal()
                     alert("생성되었습니다.")
-                }
+                },
+                error=>alert('강의실을 생성할 수 없습니다.')
             )
         }   
     }

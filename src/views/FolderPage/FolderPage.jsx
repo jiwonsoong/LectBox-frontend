@@ -53,12 +53,6 @@ function FolderPage (props) {
 
     }, [])
 
-    useEffect(()=>{
-
-        colorBar();
-
-    }, [folderInfo]);
-
     useEffect(() => {
         const listenBackEvent = () => {
           // 뒤로가기 할 때 수행할 동작을 적는다
@@ -114,11 +108,6 @@ function FolderPage (props) {
                 }
             }
         )
-    }
-    // 용량 표시 위한 css 조작 함수
-    const colorBar = ()=>{
-        const fill = folderInfo.pres_volume / folderInfo.max_volume * 100;
-        document.getElementById('barfill').style.width = fill.toString() + '%';
     }
 
 
@@ -285,6 +274,9 @@ function FolderPage (props) {
                 setFolder();
                 alert('추가되었습니다.');
                 closeAddFolderModal();
+            },
+            error=>{
+                alert('폴더를 생성할 수 없습니다.')
             }
         )
     }
@@ -353,7 +345,8 @@ function FolderPage (props) {
                     ()=>{
                         alert('폴더가 삭제되었습니다.');
                         setFolder();
-                    }
+                    },
+                    ()=>alert('폴더를 삭제할 수 없습니다.')
                 )
             } else {
                 alert('삭제 권한이 없습니다.')
@@ -367,6 +360,9 @@ function FolderPage (props) {
                     ()=>{
                         alert('파일이 삭제되었습니다.');
                         setFolder();
+                    },
+                    ()=>{
+                        alert('파일을 삭제할 수 없습니다.')
                     }
                 )
             } else {
@@ -420,15 +416,6 @@ function FolderPage (props) {
                                 }
                             })
                         }
-                    </div>
-                </div>
-                <div className='storage-box'>
-                    <div>저장용량</div>
-                    <div className='storage-content'>
-                        <div className='bar'>
-                            <div className='barfill' id='barfill'></div>
-                        </div>
-                        <div>{folderInfo.pres_volume}{' / '}{folderInfo.max_volume}{'GB'}</div>
                     </div>
                 </div>
                 <div className="SetViewContainer">

@@ -72,6 +72,7 @@ function RegisterPage(props) {
             .then(
                 response => {
                     props.history.push("/login");
+                    alert("회원가입 되었습니다.")
                 },
                 error => 
                     alert("이미 존재하는 아이디입니다.")
@@ -81,7 +82,7 @@ function RegisterPage(props) {
     const handleResponse = (response) => {
         return response.text().then(json => {
             const data = json && JSON.parse(json);
-            if (!response.status === 200) {
+            if (response.status !== 200) {
     
                 const error = (data && data.message) || response.statusText;
                 return Promise.reject(error);

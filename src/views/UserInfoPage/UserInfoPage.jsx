@@ -27,7 +27,8 @@ function UserInfoPage(props){
                 u_name: data.name,
                 u_email: data.email,
                 u_password: data.password, 
-                is_student: data.is_student    
+                is_student: data.is_student,
+                    
                 })
             });
         } else {
@@ -35,20 +36,91 @@ function UserInfoPage(props){
         }
     }, []);
 
-    
-    
-    const onNameHandler = (event) => {
-        setName(event.currentTarget.value)
+
+    /**
+     * 요청
+     */
+    // 회원정보 요청
+    const UserRequest = () => {
+        const url = baseurl + "/api/member-detail/";
+        const requestOptions = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: authHeader().Authorization,
+            },
+        };
+
+        return (
+            fetch(url, requestOptions)
+            .then(handleResponse)
+        )
+    };
+    // 회원정보 수정 요청
+    const EditUserRequest = (body) => {
+        const url = baseurl + "/api/member-detail/";
+        const requestOptions = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: authHeader().Authorization,
+                },
+            body: JSON.stringify(body)
+        };
+
+        return (fetch(url, requestOptions)
+                .then(handleResponse)
+        )
     }
-    const onEmailHandler = (event) => {
-        setEmail(event.currentTarget.value)
+    // 회원탈퇴 요청
+    const deleteRequest = () => {
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader().Authorization
+            }
+        };
+
+        const url = baseurl + '/api/member-detail/';
+
+        return (
+            fetch(url, requestOptions)
+            .then(handleResponse)
+        )
     }
-    const onSchoolHandler = (event) => {
-        setSchool(event.currentTarget.value)
+    const handleResponse = (response) => {
+        return response.text().then(json => {
+            const data = json && JSON.parse(json);
+            if (response.status !== 200) {
+                const error = (data && data.message) || response.statusText;
+                return Promise.reject(error);
+            }
+            
+            return data;
+        });
+    };
+
+
+    /**
+     * 버튼 동작
+     */
+    // 회원탈퇴
+    const deleteUser = () => {
+        if (UserInfo.u_id) {
+            deleteRequest()
+            .then(
+                ()=>{
+                    alert('회원탈퇴 되었습니다.');
+                    props.history.push('/login');
+                }
+            )
+        } else {
+            console.log(UserInfo.u_id);
+            alert('삭제 권한이 없습니다.')
+        }
     }
-    const onDepartmentHandler = (event) => {
-        setDepartment(event.currentTarget.value)
-    }
+    // 회원정보 변경
     const onSubmitHandler = (event) => {
         event.preventDefault();
 
@@ -68,6 +140,7 @@ function UserInfoPage(props){
             .then(
                 data => {
                     setUserInfo(data);
+                    setviewinput(false);
                     alert('변경되었습니다.');
                 },
                 error => {
@@ -77,8 +150,33 @@ function UserInfoPage(props){
         }
     }
 
+
+    // input 값 받아서 저장
+    const onNameHandler = (event) => {
+        setName(event.currentTarget.value)
+    }
+    const onEmailHandler = (event) => {
+        setEmail(event.currentTarget.value)
+    }
+    const onSchoolHandler = (event) => {
+        setSchool(event.currentTarget.value)
+    }
+    const onDepartmentHandler = (event) => {
+        setDepartment(event.currentTarget.value)
+    }
+    // 회원정보 수정 폼 검사
     const checkInputs = ()=>{
-        
+        const isEmail = (email) => {
+            return /^([0-9a-zA-Z_\.-]+)@([0-9a-zA-Z_-]+)(\.[0-9a-zA-Z_-]+){1,2}$/.test(email);
+        }
+        const isSchool = (school) => {
+            return school.slice(school.length-3,school.length) === "대학교";
+        }
+        const isDepartment = (department) => {
+            return (department.slice(department.length-2,department.length) === "학과") || 
+            (department.slice(department.length-2,department.length) === "학부");
+        }
+
         if(!isEmail(Email)) {
             alert('유효하지않은 형식의 이메일입니다.')
             return false;
@@ -93,109 +191,8 @@ function UserInfoPage(props){
         }
         else {
             return true;
-        }
+        }     
     }
-
-    const isEmail = (email) => {
-        return /^([0-9a-zA-Z_\.-]+)@([0-9a-zA-Z_-]+)(\.[0-9a-zA-Z_-]+){1,2}$/.test(email);
-    }
-    const isSchool = (school) => {
-        return school.slice(school.length-3,school.length) === "대학교";
-    }
-
-    const isDepartment = (department) => {
-        return (department.slice(department.length-2,department.length) === "학과") || 
-        (department.slice(department.length-2,department.length) === "학부");
-    }
-
-
-    const user_id = 'olivetree421';
-
-    
-
-    function onChangetext (e){
-        // UserInfo.u_password(e.target.value);
-    }
-
-    const UserRequest = () => {
-        const url = baseurl + "/api/member-detail/";
-        const requestOptions = {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: authHeader().Authorization,
-            },
-        };
-
-        return (
-            fetch(url, requestOptions)
-            .then(handleResponse)
-        )
-    };
-
-    const EditUserRequest = (body) => {
-        const url = baseurl + "/api/member-detail/";
-        const requestOptions = {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: authHeader().Authorization,
-                },
-            body: JSON.stringify(body)
-        };
-
-        return (fetch(url, requestOptions)
-                .then(handleResponse)
-        )
-    }
-
-    const deleteUser = () => {
-        if (UserInfo.u_id) {
-            deleteRequest()
-            .then(
-                ()=>{
-                    alert('회원탈퇴 되었습니다.');
-                    props.history.push('/login');
-                }
-            )
-        } else {
-            console.log(UserInfo.u_id);
-            alert('삭제 권한이 없습니다.')
-        }
-    }
-
-    const deleteRequest = () => {
-        const requestOptions = {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': authHeader().Authorization
-            }
-        };
-
-        const url = baseurl + '/api/member-detail/'
-
-        return (
-            fetch(url, requestOptions)
-            .then(handleResponse)
-        )
-    }
-
-    const handleResponse = (response) => {
-        return response.text().then(json => {
-            const data = json && JSON.parse(json);
-            if (!response.status === 200) {
-                if (response.status === 401) {
-                }
-    
-                const error = (data && data.message) || response.statusText;
-                return Promise.reject(error);
-            }
-            
-            return data;
-        });
-    };
-
 
     return(
         <div className="UserInfoPage">
@@ -220,16 +217,19 @@ function UserInfoPage(props){
                 <div className="UItem">
                     <p className="UItemTitle">학교</p>
                     { !viewinput && <p>{UserInfo.u_school}</p> }
-                    { viewinput && <input type="text" value={School} onChange={onSchoolHandler}/>}
+                    { viewinput && <input type="text" value={School} onChange={onSchoolHandler} placeholder='예) ㅇㅇ대학교'/>}
                 </div>
                 <div className="UItem">
                     <p className="UItemTitle">학과</p>
                     { !viewinput && <p>{UserInfo.u_subject}</p> }
-                    { viewinput && <input type="text" value={Department} onChange={onDepartmentHandler}/>}
+                    { viewinput && <input type="text" value={Department} onChange={onDepartmentHandler} placeholder='예) ㅇㅇ학과 또는 ㅇㅇ학부'/>}
                 </div>
                 <div className="UItem">
-                    <button onClick={() => {setviewinput(true);}}>변경</button>
-                    <button type="submit" onClick={onSubmitHandler}>확인</button>
+                    {
+                        viewinput === false
+                        ? (<button onClick={() => {setviewinput(true);}}>변경</button>)
+                        : (<button type="submit" onClick={onSubmitHandler}>확인</button>)
+                    }
                 </div>
                 <div className="UItem">
                     <button className="UButton" onClick={deleteUser}>회원탈퇴</button>

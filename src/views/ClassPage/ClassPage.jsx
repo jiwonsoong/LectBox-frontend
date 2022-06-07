@@ -79,6 +79,7 @@ function ClassPage(props) {
         folderInfoRequest()
         .then(
             data=>{
+                console.log(data);
                 setfolderInfo({
                     id: data.id,
                     made_by: data.made_by,
@@ -294,6 +295,8 @@ function ClassPage(props) {
 
         const url = baseurl + '/api/folder/' + parentId + '/file/';
 
+        formData.append('data', new Blob([JSON.stringify({is_protected: true})] , {type: "application/json"}));
+
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -302,7 +305,7 @@ function ClassPage(props) {
             },
             body: formData
         };
-        console.log();
+        
         return (
             fetch(url, requestOptions)
             .then(handleResponse)
@@ -363,7 +366,8 @@ function ClassPage(props) {
                 setFolder();
                 closeAddFolderModal();
                 alert('추가되었습니다.');
-            }
+            },
+            ()=>alert('폴더를 추가할 수 없습니다.')
         )
     }
     // 생성할 폴더의 부모 폴더 설정 함수
@@ -401,7 +405,9 @@ function ClassPage(props) {
 
         const formData = new FormData();
         formData.append('file', newFile);
-        console.log(formData);
+
+        // console.log(formData);
+
         addFileRequest(formData)
         .then(
             data => { 
@@ -446,6 +452,9 @@ function ClassPage(props) {
                 ()=>{
                     alert('폴더가 삭제되었습니다.');
                     setFolder();
+                },
+                ()=>{
+                    alert('폴더를 삭제할 수 없습니다.');
                 }
             )
         } else {
@@ -605,7 +614,7 @@ function ClassPage(props) {
                         <div className='bar'>
                             <div className='barfill' id='barfill'></div>
                         </div>
-                        <div>{folderInfo.pres_volume}{' / '}{folderInfo.max_volume}{'GB'}</div>
+                        <div>{folderInfo.pres_volume}{' / '}{folderInfo.max_volume}{'MB'}</div>
                     </div>
                 </div>
                 <div className="SetViewContainer">
@@ -712,7 +721,7 @@ function ClassPage(props) {
                                     </div>
                                     )
                                     : (
-                                    <div className="Iconbox" onDoubleClick={()=>FileDownload}>
+                                    <div className="Iconbox" onDoubleClick={FileDownload}>
                                         <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
                                     </div>
                                     )
