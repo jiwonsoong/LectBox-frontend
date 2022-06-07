@@ -19,56 +19,18 @@ function UserInfoPage(props){
         if (user){
             // 유저 정보 요청
             UserRequest()
-<<<<<<< HEAD
             .then(
                 data => {
-                    console.log(data)
                     setUserInfo(data)
                 },
                 error => alert('유저 정보를 불러올 수 없습니다.')
             );
-=======
-            .then((data) => {
-                console.log(data);
-
-                setUserInfo({
-                u_id: data.id,
-                u_name: data.name,
-                u_email: data.email,
-                u_password: data.password, 
-                is_student: data.is_student,
-                u_school: data.school,
-                u_subject: data.department    
-                })
-            });
->>>>>>> 9c185c13b9afd934e1f7b38a9988f7a46ffa4c3c
         } else {
             return ;
         }
     }, []);
 
-<<<<<<< HEAD
-=======
-    useEffect(()=>{
-        
-        UserRequest()
-        .then((data) => {
-            console.log(data);
 
-            setUserInfo({
-            u_id: data.id,
-            u_name: data.name,
-            u_email: data.email,
-            u_password: data.password, 
-            is_student: data.is_student,
-            u_school: data.school,
-            u_subject: data.department    
-            })
-        });
-
-    }, [UserInfo]);
-
->>>>>>> 9c185c13b9afd934e1f7b38a9988f7a46ffa4c3c
     /**
      * 요청
      */
@@ -103,11 +65,7 @@ function UserInfoPage(props){
         return (fetch(url, requestOptions)
                 .then(handleResponse)
         )
-<<<<<<< HEAD
     };
-=======
-    }
->>>>>>> 9c185c13b9afd934e1f7b38a9988f7a46ffa4c3c
     // 회원탈퇴 요청
     const deleteRequest = () => {
         const requestOptions = {
