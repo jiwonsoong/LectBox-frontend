@@ -37,7 +37,7 @@ function ManageClassPage(props) {
      */
     // 폴더 정보 요청 함수
     const folderRequest = () => {
-        const url = baseurl + "/api/folder/" + params.pro + "/0";
+        const url = baseurl + "/api/folder/" + path.pro + "/0";
         const requestOptions = {
         method: "GET",
         headers: {
