@@ -251,7 +251,7 @@ function ClassPage(props) {
             parentId = folderInfo.assignId;
         }
 
-        const url = baseurl + '/api/foler/' + parentId.toString() + '/file/' + selectedItem.id.toString() + '/';
+        const url = baseurl + '/api/folder/' + parentId.toString() + '/file/' + selectedItem.id.toString() + '/delete/';
         
         const requestOptions = {
             method: 'DELETE',
@@ -321,7 +321,7 @@ function ClassPage(props) {
             }
         };
 
-        const url = baseurl + '/api/foler/' + path.pro.toString() + '/file/' + selectedItem.id.toString() + '/downloads';
+        const url = baseurl + '/api/folder/' + path.pro.toString() + '/file/' + selectedItem.id.toString() + '/downloads';
 
         return (
             fetch(url,requestOptions)
@@ -446,7 +446,7 @@ function ClassPage(props) {
         // 폴더 삭제
         
         if (true) { 
-            console.log("file");
+            console.log(folderInfo.lectureId);
             deleteFileRequest()
             .then(
                 ()=>{
@@ -554,8 +554,8 @@ function ClassPage(props) {
     const FileDownload = () => {
         console.log("double clock");
         FileDownloadRequest()
-        .then((response) => {
-            const blob = new Blob([response.data]);
+        .then(response => {
+            /*const blob = new Blob([response.data]);
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -568,9 +568,11 @@ function ClassPage(props) {
             document.body.appendChild(link);
             link.click();
             link.remove();
-            window.URL.revokeObjectURL(url);
-        }
-        )
+            window.URL.revokeObjectURL(url);*/
+            console.log(response);
+        }).catch(e => {
+            console.log(e);
+        });
     }
 
     /*const FileDownload = (response) => {
@@ -644,7 +646,7 @@ function ClassPage(props) {
                                 {
                                     Lectviewbutton === true && (
                                     <div className='EditfolderButton'>
-                                        <div className="DE" onClick={deleteItem}><FontAwesomeIcon icon={faTrashCan} /></div>
+                                        <div className="DE" onClick={FileDownload}><FontAwesomeIcon icon={faTrashCan} /></div>
                                         <div style={{color:'#efefef'}}> | </div>
                                     </div>
                                     ) 
