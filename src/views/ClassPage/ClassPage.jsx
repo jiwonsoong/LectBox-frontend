@@ -646,7 +646,7 @@ function ClassPage(props) {
                                 {
                                     Lectviewbutton === true && (
                                     <div className='EditfolderButton'>
-                                        <div className="DE" onClick={FileDownload}><FontAwesomeIcon icon={faTrashCan} /></div>
+                                        <div className="DE" onClick={deleteItem}><FontAwesomeIcon icon={faTrashCan} /></div>
                                         <div style={{color:'#efefef'}}> | </div>
                                     </div>
                                     ) 
