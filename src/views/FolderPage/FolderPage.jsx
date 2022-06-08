@@ -22,10 +22,8 @@ function FolderPage (props) {
     const [user, setuser] = useState({});
     const baseurl = 'http://3.231.84.43:8000';
     let path = JSON.parse(localStorage.getItem('path'));
-    const history = createBrowserHistory();
+    // const history = createBrowserHistory();
 
-    // 필요한 데이터:
-    // 부모 폴더 아이디
 
     // 페이지 첫 렌더링 시 동작
     useEffect(()=>{
@@ -53,23 +51,23 @@ function FolderPage (props) {
 
     }, [])
 
-    useEffect(() => {
-        const listenBackEvent = () => {
-          // 뒤로가기 할 때 수행할 동작을 적는다
+    // useEffect(() => {
+    //     const listenBackEvent = () => {
+    //       // 뒤로가기 할 때 수행할 동작을 적는다
           
-        };
+    //     };
     
-        const unlistenHistoryEvent = history.listen(({ action }) => {
-          if (action === "POP") {
-            console.log('뒤로가기')
-            listenBackEvent();
-          }
-        });
+    //     const unlistenHistoryEvent = history.listen(({ action }) => {
+    //       if (action === "POP") {
+    //         console.log('뒤로가기')
+    //         listenBackEvent();
+    //       }
+    //     });
     
-        return unlistenHistoryEvent;
-      }, [
-      // effect에서 사용하는 state를 추가
-    ]);
+    //     return unlistenHistoryEvent;
+    //   }, [
+    //   // effect에서 사용하는 state를 추가
+    // ]);
 
     //파일 객체 설정후 동작
     useEffect(()=>{
@@ -117,7 +115,7 @@ function FolderPage (props) {
     // 폴더 정보 요청 함수
     const folderRequest = () => {
         
-        const url = baseurl + '/api/folder/' + path.pro + '/1';
+        const url = baseurl + '/api/folder/' + path.pro;
 
         const requestOptions = {
             method: 'GET',
@@ -173,6 +171,8 @@ function FolderPage (props) {
     const addFileRequest = (formData)=>{
         const url = baseurl + '/api/folder/' + folderInfo.id.toString() + '/file/';
 
+        formData.append('data', new Blob([JSON.stringify({is_protected: true})] , {type: "application/json"}));
+
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -225,9 +225,6 @@ function FolderPage (props) {
         return response.text().then(json => {
             const data = json && JSON.parse(json);
             if (response.status !== 200) {
-                if (response.status === 401) {
-                    window.location.reload(true);
-                }
     
                 const error = (data && data.message) || response.statusText;
                 return Promise.reject(error);
@@ -301,7 +298,6 @@ function FolderPage (props) {
     // 업로드할 파일 입력 함수
     const onFileHandler = (event)=>{
         setnewFile(event.target.files[0]);
-        //onFileSubmitHandler();
     }
     // 파일 업로드 함수
     const onFileSubmitHandler = ()=> {
@@ -328,7 +324,7 @@ function FolderPage (props) {
      */
     // 폴더 열기 함수
     const onFolderHandler = (folderId) => {
-        localStorage.setItem('path', JSON.stringify({pre: path.pro, pro: folderId, post: ''}));
+        localStorage.setItem('path', JSON.stringify({pro: folderId, class: path.class, className: path.className}));
         window.location.reload();
     }
 
@@ -408,12 +404,21 @@ function FolderPage (props) {
                         {
                             folderPath.map(function(item){
                                 if (item === folderInfo.name) {
-                                    return (<div key={item}>{item}</div>)
+                                    return (<div key={item}>{'>'}{item}</div>)
                                 }
                                 else {
-                                    return (
-                                        <div key={item}>{item} {'>'}</div>
-                                    )
+                                    if (item === path.className) {
+                                        return (<div key={item}
+                                            onClick={()=>{
+                                                localStorage.setItem('path', JSON.stringify({pro: path.class, class: path.class, className: path.className}));
+                                                props.history.push('/class');
+                                            }} 
+                                            style={{textDecoration:'underline', cursor: 'pointer'}}
+                                        >{item} </div>)
+                                    }
+                                    else {
+                                        return (<div key={item}>{'>'}{item} </div>)
+                                    }
                                 }
                             })
                         }
@@ -428,13 +433,13 @@ function FolderPage (props) {
                                 : (<div title="리스트 보기"><FontAwesomeIcon icon={faTableList} /></div>)
                             }
                         </div>
-                        <div onClick={onSortHandler} className='SetViewElement'>
+                        {/* <div onClick={onSortHandler} className='SetViewElement'>
                             {
                                 sort === 'name'
                                 ? (<div title="최신순"><FontAwesomeIcon icon={faArrowDown19} /></div>)
                                 : (<div title="이름순"><FontAwesomeIcon icon={faArrowDownAZ} /></div>)
                             }
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <div className="FBContainer">
@@ -474,6 +479,7 @@ function FolderPage (props) {
                             <div className="ListColDescription">
                                 <div className='ListColLeft'>이름</div>
                                 <div>소유자</div>
+                                <div className="volumeTitle">용량</div>
                             </div>
                             {
                                 folderItems.map(function(item){
@@ -494,7 +500,13 @@ function FolderPage (props) {
                                                 }
                                             </div>
                                             <div className='ListOwner'>
-                                                <p>{''}</p>
+                                                <p>{item.child_made_by_name}</p>
+                                            </div>
+                                            <div className='ListVolume'>
+                                                {
+                                                    item.is_folder === false &&
+                                                    (<div>{item.child_volume}{'KB'}</div>)
+                                                }
                                             </div>
                                         </div>
                                     )
@@ -509,17 +521,17 @@ function FolderPage (props) {
                                 {
                                     item.is_folder === true 
                                     ? (
-                                    <div className="Iconbox" onDoubleClick={()=>onFolderHandler(item.child)}>
+                                    <div title={item.name} className="Iconbox" onDoubleClick={()=>onFolderHandler(item.child)}>
                                         <FontAwesomeIcon icon={faFolder} className="FolderIcon"/>
                                     </div>
                                     )
                                     : (
-                                    <div className="Iconbox">
+                                    <div title={item.name} className="Iconbox">
                                         <FontAwesomeIcon icon={faFileLines} className="FileIcon"/>
                                     </div>
                                     )
                                 }
-                                    <div className="IconNameBox">
+                                    <div title={item.name} className="IconNameBox">
                                         <p>{item.name}</p>
                                     </div>            
                                 </li>

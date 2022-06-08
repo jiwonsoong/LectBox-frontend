@@ -37,8 +37,6 @@ function ManageClassPage(props) {
      */
     // 폴더 정보 요청 함수
     const folderRequest = () => {
-        console.log(path)
-        console.log(path.pro)
         const url = baseurl + "/api/folder/" + path.pro + "/0";
         const requestOptions = {
         method: "GET",
@@ -75,7 +73,7 @@ function ManageClassPage(props) {
     const handleResponse = (response) => {
         return response.text().then(json => {
             const data = json && JSON.parse(json);
-            if (!response.status === 200) {
+            if (response.status !== 200) {
                 if (response.status === 400 ||
                     response.status === 401 ||
                     response.status === 404) {
@@ -100,10 +98,11 @@ function ManageClassPage(props) {
         if (user.id === folderInfo.manager) {
             deleteRequest()
             .then(
-                ()=>{
+                data =>{
                     alert('강의실이 삭제되었습니다.');
                     props.history.push('/user');
-                }
+                },
+                error=> alert('삭제에 실패했습니다.')
             )
         } else {
             alert('삭제 권한이 없습니다.')

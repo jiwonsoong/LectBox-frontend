@@ -14,6 +14,7 @@ function HomePage(props) {
     const [itemList, setitemList] = useState([]); // 강의실 목록 
     const [user, setuser] = useState({}); // 유저 정보 
     const baseurl = 'http://3.231.84.43:8000'
+    localStorage.setItem('path', JSON.stringify({pro: '', class: '', className: ''}));
 
     // 페이지 첫 렌더링 시 동작
     useEffect(() => {
@@ -39,6 +40,7 @@ function HomePage(props) {
         .then(
             data => {
                 if (true) {
+                    console.log(data);
                     setitemList(data);
                 }
             },
@@ -136,7 +138,7 @@ function HomePage(props) {
     const openFolder = (item)=> {
         // 페이지 리다이렉트
         const url = '/class';
-        localStorage.setItem('path', JSON.stringify({pre: '', pro: item.id, post: ''}));
+        localStorage.setItem('path', JSON.stringify({pro: item.id, class: item.id, className: item.name}));
         props.history.push(url);
     }
 
@@ -228,13 +230,13 @@ function HomePage(props) {
                             : (<div title="리스트 보기"><FontAwesomeIcon icon={faTableList} /></div>)
                         }
                     </div>
-                    <div onClick={onSortHandler} className='SetViewElement'>
+                    {/* <div onClick={onSortHandler} className='SetViewElement'>
                         {
                             sort === 'name'
                             ? (<div title="최신순"><FontAwesomeIcon icon={faArrowDown19} /></div>)
                             : (<div title="이름순"><FontAwesomeIcon icon={faArrowDownAZ} /></div>)
                         }
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <div className="CategoryContainer">
@@ -252,7 +254,7 @@ function HomePage(props) {
                     <div className="ListView">
                         <div className="ListColDescription">
                             <div className='ListColLeft'>강의실 이름</div>
-                            <div>강의자</div>
+                            {/* <div>강의자</div> */}
                         </div>
                         {
                             itemList.map(function(item){
@@ -264,9 +266,9 @@ function HomePage(props) {
                                         <div className="ListNameBox">
                                             <p>{item.name}</p>
                                         </div>
-                                        <div className='ListOwner'>
+                                        {/* <div className='ListOwner'>
                                             <p>{item.made_by}</p>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 )
                             })

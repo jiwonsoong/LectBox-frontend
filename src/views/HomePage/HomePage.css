@@ -99,7 +99,7 @@
 
 .ListItem .ListNameBox {
     margin: 0 10px;
-    width: 600px;
+    width: 570px;
 }
 .ListNameBox:hover {
     cursor:pointer;
@@ -108,15 +108,19 @@
     margin: 0 0;
 }
 
+.volumeTitle {
+    margin-left: 210px;
+}
+
 .ListColLeft {
-    width: 610px;
+    width: 580px;
 }
 .ListColLeft p {
     margin: 0 0;
 }
 
 .ListItem .ListOwner {
-
+    width: 250px;
 }
 .ListItem .ListOwner p{
     margin: 0 0;
@@ -159,8 +163,25 @@ ul {
     margin: 0 0 10px 0;
 }
 
+
 .IconNameBox p {
+    font-size: 14px;
+    width: 160px;
+    text-align: center;
+    overflow: hidden;  	
+    text-overflow: ellipsis;  	
+    white-space: nowrap; 	
+    word-break:break-all;
+}
+
+.HomePage .IconNameBox p {
     font-size: 16px;
+    width: 130px;
+    text-align: center;
+    overflow: visible;  		
+    white-space: normal; 	
+    word-break: break-word;
+    text-overflow: unset;
 }
 
 .modal {

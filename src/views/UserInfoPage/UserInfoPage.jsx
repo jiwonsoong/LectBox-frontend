@@ -19,42 +19,17 @@ function UserInfoPage(props){
         if (user){
             // 유저 정보 요청
             UserRequest()
-            .then((data) => {
-                console.log(data);
-
-                setUserInfo({
-                u_id: data.id,
-                u_name: data.name,
-                u_email: data.email,
-                u_password: data.password, 
-                is_student: data.is_student,
-                u_school: data.school,
-                u_subject: data.department    
-                })
-            });
+            .then(
+                data => {
+                    setUserInfo(data)
+                },
+                error => alert('유저 정보를 불러올 수 없습니다.')
+            );
         } else {
             return ;
         }
     }, []);
 
-    useEffect(()=>{
-        
-        UserRequest()
-        .then((data) => {
-            console.log(data);
-
-            setUserInfo({
-            u_id: data.id,
-            u_name: data.name,
-            u_email: data.email,
-            u_password: data.password, 
-            is_student: data.is_student,
-            u_school: data.school,
-            u_subject: data.department    
-            })
-        });
-
-    }, [UserInfo]);
 
     /**
      * 요청
@@ -90,7 +65,7 @@ function UserInfoPage(props){
         return (fetch(url, requestOptions)
                 .then(handleResponse)
         )
-    }
+    };
     // 회원탈퇴 요청
     const deleteRequest = () => {
         const requestOptions = {
@@ -126,16 +101,16 @@ function UserInfoPage(props){
      */
     // 회원탈퇴
     const deleteUser = () => {
-        if (UserInfo.u_id) {
+        if (UserInfo.id) {
             deleteRequest()
             .then(
                 ()=>{
                     alert('회원탈퇴 되었습니다.');
                     props.history.push('/login');
-                }
+                },
+                ()=>alert('회원탈퇴에 실패했습니다.')
             )
         } else {
-            console.log(UserInfo.u_id);
             alert('삭제 권한이 없습니다.')
         }
     }
@@ -146,13 +121,12 @@ function UserInfoPage(props){
         // 폼 유효성 검사
         if (checkInputs()){
             let body = {
-                id: UserInfo.u_id,
-                pw: UserInfo.u_password,
+                id: UserInfo.id,
                 is_student: UserInfo.is_student,
-                name: Name,
-                email: Email,
-                school: School,
-                department: Department
+                name: UserInfo.name,
+                email: UserInfo.email,
+                school: UserInfo.school,
+                department: UserInfo.department
             }
     
             EditUserRequest(body)
@@ -221,33 +195,43 @@ function UserInfoPage(props){
                 </div>
                 <div className="UItem">
                     <p className="UItemTitle">아이디</p>
-                    <p>{UserInfo.u_id}</p>
+                    <p>{UserInfo.id}</p>
                 </div>
                 <div className="UItem">
-                    <p className="UItemTitle">이메일</p>
-                    { !viewinput && <p>{UserInfo.u_email}</p> }
-                    { viewinput && <input type="text" value={Email} onChange={onEmailHandler}/>}
-                </div>
+                    <p className="UItemTitle">권한</p>
+                    { UserInfo.is_student===true
+                    ? <p>수강자</p> 
+                    : <p>강의자</p>}
+                </div> 
                 <div className="UItem">
                     <p className="UItemTitle">이름</p>
-                    { !viewinput && <p>{UserInfo.u_name}</p> }
+                    { !viewinput && <p>{UserInfo.name}</p> }
                     { viewinput && <input type="text" value={Name} onChange={onNameHandler}/>}
                 </div> 
                 <div className="UItem">
+                    <p className="UItemTitle">이메일</p>
+                    { !viewinput && <p>{UserInfo.email}</p> }
+                    { viewinput && <input type="text" value={Email} onChange={onEmailHandler}/>}
+                </div>
+                <div className="UItem">
                     <p className="UItemTitle">학교</p>
-                    { !viewinput && <p>{UserInfo.u_school}</p> }
+                    { !viewinput && <p>{UserInfo.school}</p> }
                     { viewinput && <input type="text" value={School} onChange={onSchoolHandler} placeholder='예) ㅇㅇ대학교'/>}
                 </div>
                 <div className="UItem">
                     <p className="UItemTitle">학과</p>
-                    { !viewinput && <p>{UserInfo.u_subject}</p> }
+                    { !viewinput && <p>{UserInfo.department}</p> }
                     { viewinput && <input type="text" value={Department} onChange={onDepartmentHandler} placeholder='예) ㅇㅇ학과 또는 ㅇㅇ학부'/>}
                 </div>
                 <div className="UItem">
                     {
                         viewinput === false
                         ? (<button onClick={() => {setviewinput(true);}}>변경</button>)
-                        : (<button type="submit" onClick={onSubmitHandler}>확인</button>)
+                        : (
+                        <>
+                            <button type="submit" onClick={onSubmitHandler}>확인</button>
+                            <button type="submit" onClick={() => {setviewinput(false);}}>취소</button>
+                        </>)
                     }
                 </div>
                 <div className="UItem">
