@@ -3,7 +3,7 @@ import React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileLines } from '@fortawesome/free-regular-svg-icons';
-import { faTrashCan, faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus } from '@fortawesome/free-solid-svg-icons'
+import { faTrashCan, faGear, faFolder, faFolderPlus, faArrowDownAZ, faArrowDown19, faTableList, faTableCellsLarge, faFileCirclePlus , faDownload} from '@fortawesome/free-solid-svg-icons'
 import { authHeader } from '../../_helpers';
 import axios from 'axios';
 
@@ -34,6 +34,7 @@ function ClassPage(props) {
 
         if (user){
             setuser({
+                name: user.name,
                 id: user.id,
                 is_student: user.is_student
             })
@@ -139,6 +140,9 @@ function ClassPage(props) {
             
             return data;
         });
+    }
+    const handleimageResponse = (response) => {
+        return response.blob();
     }
     // 강의실 정보 요청 함수 
     const folderInfoRequest = ()=>{
@@ -314,19 +318,31 @@ function ClassPage(props) {
     }
     // 파일 다운로드 요청 함수
     const FileDownloadRequest = () => {
+        let parentId = '';
+
+        if (Lectviewbutton === true) {
+            parentId = folderInfo.lectureId;
+        } 
+        // 과제 폴더에서 삭제하는 경우
+        else {
+            parentId = folderInfo.assignId;
+        }
+        
         const requestOptions = {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
+                //'Content-Type': 'application/json',
                 'Authorization': authHeader().Authorization
             }
         };
 
-        const url = baseurl + '/api/folder/' + path.pro.toString() + '/file/' + selectedItem.id.toString() + '/downloads';
+        
+        console.log(parentId);
+        const url = baseurl + '/api/folder/' + parentId + '/file/' + selectedItem.id.toString() + '/downloads';
 
         return (
             fetch(url,requestOptions)
-            .then(handleResponse)
+            .then(handleimageResponse)
         )
     } 
 
@@ -443,9 +459,10 @@ function ClassPage(props) {
      */
     // 폴더, 파일 삭제 함수
     const deleteItem = () => {
-        // 폴더 삭제
-        
-        if (true) { 
+        // 파일 삭제
+        console.log(user);
+        console.log(selectedItem);
+        if (selectedItem.made_by === user.name) { 
             console.log(folderInfo.lectureId);
             deleteFileRequest()
             .then(
@@ -459,7 +476,7 @@ function ClassPage(props) {
             )
         } else {
             alert('삭제 권한이 없습니다.')
-        }
+        }   
         /*
         if (selectedItem.is_folder === true) {
         
@@ -494,6 +511,7 @@ function ClassPage(props) {
     const clickEvent = (item, type) =>{
         // 강의에서 선택됨
         if (type === 1) {
+            setisLect(true);
             // 선택된게 한 번 더 선택 => 선택 취소 
             if (selectedItem.id === item.id) {
                 setLectviewbutton(false); // 삭제 버튼 안 보이게
@@ -509,7 +527,7 @@ function ClassPage(props) {
                     document.getElementById(selectedItem.id).style.backgroundColor = 'white';
                     setselectedItem({id: item.id, made_by: item.made_by});
                     document.getElementById(item.id).style.backgroundColor = '#efefef';
-                    console.log("sected");
+                    console.log(item);
                 } 
                 // 기존에 선택된 게 없는 경우 
                 else {
@@ -521,6 +539,7 @@ function ClassPage(props) {
         } 
         // 과제에서 선택됨
         else {
+            setisLect(false);
             // 선택된게 한 번 더 선택 => 선택 취소 
             if (selectedItem.id === item.id) {
                 setviewbutton(false); // 삭제 버튼 안 보이게
@@ -552,47 +571,53 @@ function ClassPage(props) {
      */
     // 파일 다운로드 함수
     const FileDownload = () => {
-        console.log("double clock");
-        FileDownloadRequest()
-        .then(response => {
-            /*const blob = new Blob([response.data]);
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-      
-            const filename = response.headers['content-disposition']
-            .split('filename=')[1]
-            .split(';')[0];
-      
-            link.setAttribute('download', filename);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);*/
-            console.log(response);
-        }).catch(e => {
-            console.log(e);
-        });
+        console.log(isLect);
+        if(!isLect){
+            console.log('a');
+            if(selectedItem.made_by === user.name || !user.is_student)
+            {
+                console.log('b');
+                FileDownloadRequest()
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+            
+                    const filename = 'image';
+            
+                    link.setAttribute('download', filename);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    window.URL.revokeObjectURL(url);
+                }).catch(e => {
+                    console.log(e);
+                });
+            }
+        }else{
+            console.log('c');
+            if(!user.is_student){
+                console.log('d');
+                FileDownloadRequest()
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+            
+                    const filename = 'image';
+            
+                    link.setAttribute('download', filename);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    window.URL.revokeObjectURL(url);
+                }).catch(e => {
+                    console.log(e);
+                });
+            }alert('다운로드에 실패했습니다.');
+        }
     }
 
-    /*const FileDownload = (response) => {
-        const blob = new Blob([response.data], { type: response.headers['content-type'] });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-      
-        const filename = response.headers['content-disposition']
-          .split('filename=')[1]
-          .split(';')[0];
-      
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(url);
-      };*/
-
-    
 
 
     return (
@@ -642,6 +667,16 @@ function ClassPage(props) {
                     <div className='ItemTitle'>
                         <div>강의</div>
                         <div className='BContainer'>
+                            <div className='DeleteContainer'>
+                                {
+                                    Lectviewbutton === true && (
+                                    <div className='EditfolderButton'>
+                                        <div className="DE" onClick={FileDownload}><FontAwesomeIcon icon={faDownload}/></div>
+                                        <div style={{color:'#efefef'}}> | </div>
+                                    </div>
+                                    ) 
+                                }
+                            </div>
                             <div className='DeleteContainer'>
                                 {
                                     Lectviewbutton === true && (
@@ -699,8 +734,8 @@ function ClassPage(props) {
                                             <div className='ListNameBox'>
                                                 {
                                                     item.is_folder === true
-                                                    ? (<div onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: ''}, 1)} onDoubleClick={()=>onFolderHandler(item.child)}>{item.name}</div>)
-                                                    : (<div onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: ''}, 1)} onDoubleClick={()=>FileDownload} >{item.name}</div>)
+                                                    ? (<div onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: item.child_made_by_name}, 1)} onDoubleClick={()=>onFolderHandler(item.child)}>{item.name}</div>)
+                                                    : (<div onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: item.child_made_by_name}, 1)} onDoubleClick={()=>FileDownload} >{item.name}</div>)
                                                 }
                                             </div>
                                             <div className='ListOwner'>
@@ -721,7 +756,7 @@ function ClassPage(props) {
                         <ul className="IconList">
                         {
                             lectItems.map(item => (
-                                <li key={item.child} id={item.child} onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: ''}, 1)} > 
+                                <li key={item.child} id={item.child} onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: item.child_made_by_name}, 1)} > 
                                 {
                                     item.is_folder === true 
                                     ? (
@@ -750,6 +785,16 @@ function ClassPage(props) {
                     <div className='ItemTitle'>
                         <div>과제</div>
                         <div className='BContainer'>
+                            <div className='DeleteContainer'>
+                                {
+                                    viewbutton === true && (
+                                    <div className='EditfolderButton'>
+                                        <div className="DE" onClick={FileDownload}><FontAwesomeIcon icon={faDownload}/></div>
+                                        <div style={{color:'#efefef'}}> | </div>
+                                    </div>
+                                    ) 
+                                }
+                            </div>
                             <div className='DeleteContainer'>
                                 {
                                     viewbutton === true && (
@@ -806,8 +851,8 @@ function ClassPage(props) {
                                             <div className='ListNameBox'>
                                                 {
                                                     item.is_folder === true
-                                                    ? (<p onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: ''}, 2)} onDoubleClick={()=>onFolderHandler(item.child)}>{item.name}</p>)
-                                                    : (<p onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: ''}, 2)} onDoubleClick={()=>FileDownload}>{item.name}</p>)
+                                                    ? (<p onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: item.child_made_by_name}, 2)} onDoubleClick={()=>onFolderHandler(item.child)}>{item.name}</p>)
+                                                    : (<p onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: item.child_made_by_name}, 2)} onDoubleClick={()=>FileDownload}>{item.name}</p>)
                                                 }
                                             </div>
                                             <div className='ListOwner'>
@@ -828,7 +873,7 @@ function ClassPage(props) {
                         <ul className="IconList">
                         {
                             assignItems.map(item => (
-                                <li key={item.child} id={item.child} onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: ''}, 2)}> 
+                                <li key={item.child} id={item.child} onClick={()=>clickEvent({id: item.child, is_folder: item.is_folder, made_by: item.child_made_by_name}, 2)}> 
                                 {
                                     item.is_folder === true 
                                     ? (

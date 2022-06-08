@@ -30,6 +30,17 @@ function UserInfoPage(props){
         }
     }, []);
 
+    useEffect(() => {
+        UserRequest()
+            .then(
+                data => {
+                    setUserInfo(data)
+                },
+                error => alert('유저 정보를 불러올 수 없습니다.')
+            );
+
+    },[UserInfo])
+
 
     /**
      * 요청
