@@ -4,8 +4,7 @@ import { authHeader } from "../../_helpers";
 import './UserInfoPage.css';
 
 function UserInfoPage(props){
-	const [UserInfo, setUserInfo] = useState({u_id: "", u_email: "", u_name: "",u_password: 
-    "",change_password: "", u_school: "", u_subject: "", is_student: true});
+	const [UserInfo, setUserInfo] = useState({});
     const [viewinput,setviewinput] =useState(false);
     const [Name, setName] = useState("")
     const [Email, setEmail] = useState("")
@@ -18,18 +17,28 @@ function UserInfoPage(props){
 
         if (user){
             // 유저 정보 요청
-            UserRequest()
-            .then(
-                data => {
-                    setUserInfo(data)
-                },
-                error => alert('유저 정보를 불러올 수 없습니다.')
-            );
+            setUser();
         } else {
-            return ;
+            return;
         }
     }, []);
 
+
+    // 
+    const setUser = () =>{
+        UserRequest()
+            .then(
+                data => {
+                    console.log(data);
+                    setUserInfo(data)
+                    setName(data.name);
+                    setEmail(data.email);
+                    setSchool(data.school);
+                    setDepartment(data.department);
+                },
+                error => alert('유저 정보를 불러올 수 없습니다.')
+            );
+    }
 
     /**
      * 요청
@@ -63,7 +72,7 @@ function UserInfoPage(props){
         };
 
         return (fetch(url, requestOptions)
-                .then(handleResponse)
+            .then(handleResponse)
         )
     };
     // 회원탈퇴 요청
@@ -101,18 +110,14 @@ function UserInfoPage(props){
      */
     // 회원탈퇴
     const deleteUser = () => {
-        if (UserInfo.id) {
-            deleteRequest()
-            .then(
-                ()=>{
-                    alert('회원탈퇴 되었습니다.');
-                    props.history.push('/login');
-                },
-                ()=>alert('회원탈퇴에 실패했습니다.')
-            )
-        } else {
-            alert('삭제 권한이 없습니다.')
-        }
+        deleteRequest()
+        .then(
+            ()=>{
+                alert('회원탈퇴 되었습니다.');
+                props.history.push('/login');
+            },
+            ()=>alert('회원탈퇴에 실패했습니다.')
+        )
     }
     // 회원정보 변경
     const onSubmitHandler = (event) => {
@@ -120,19 +125,20 @@ function UserInfoPage(props){
 
         // 폼 유효성 검사
         if (checkInputs()){
-            let body = {
+            const body = {
                 id: UserInfo.id,
                 is_student: UserInfo.is_student,
-                name: UserInfo.name,
-                email: UserInfo.email,
-                school: UserInfo.school,
-                department: UserInfo.department
+                name: Name,
+                email: Email,
+                school: School,
+                department: Department
             }
+            console.log(body)
     
             EditUserRequest(body)
             .then(
                 data => {
-                    setUserInfo(data);
+                    setUser();
                     setviewinput(false);
                     alert('변경되었습니다.');
                 },
