@@ -48,7 +48,7 @@ function LoginPage() {
                 </div>
                 <div className="form-group">
                     <label>비밀번호</label>
-                    <input type="pw" name="pw" value={pw} onChange={handleChange} className={'form-control' + (submitted && !pw ? ' is-invalid' : '')} />
+                    <input type="password" name="pw" value={pw} onChange={handleChange} className={'form-control' + (submitted && !pw ? ' is-invalid' : '')} />
                     {submitted && !pw &&
                         <div className="invalid-feedback">비밀번호를 입력해주세요</div>
                     }

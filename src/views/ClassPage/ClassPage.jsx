@@ -573,7 +573,6 @@ function ClassPage(props) {
     const FileDownload = () => {
         console.log(isLect);
         if(!isLect){
-            console.log('a');
             if(selectedItem.made_by === user.name || !user.is_student)
             {
                 console.log('b');
@@ -593,11 +592,11 @@ function ClassPage(props) {
                 }).catch(e => {
                     console.log(e);
                 });
+            }else{
+                alert('다운로드에 실패했습니다.');
             }
         }else{
-            console.log('c');
             if(!user.is_student){
-                console.log('d');
                 FileDownloadRequest()
                 .then(blob => {
                     const url = window.URL.createObjectURL(blob);

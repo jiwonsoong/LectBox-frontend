@@ -17,7 +17,7 @@
 .FButtonBox {
     margin-top: 20px;
     display: flex;
-    width: 85px;
+    width: 120px;
     justify-content: space-between;
     align-items: center;
 }
