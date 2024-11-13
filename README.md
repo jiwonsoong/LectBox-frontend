@@ -13,7 +13,7 @@ LectBox는 대학생을 위한 강의용 공유 드라이브로, DropBox를 모�
   
 - 계정관리 및 로그아웃 가능
      
-![image](https://github.com/KHU-LectBox/LectBox_back/assets/92240138/940557d7-24eb-4633-9eca-3ef58c06a9d5)
+![제목 없음](https://github.com/user-attachments/assets/5e228c94-83e1-45bb-9bdf-ae8d32f4bd79)
   
 - 강의자 계정은 강의실 생성이 가능하다
   - 강의실 생성
